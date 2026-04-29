@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Participação</title>
+    <title>Fórum</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -10,8 +10,10 @@
     <div class="container d-flex justify-content-between align-items-center">
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
         <div class="d-flex gap-2">
-            <a th:href="@{/usuario}" class="nav-link">Usuários</a>
+            <a th:href="@{/aluno}" class="nav-link">Alunos</a>
             <a th:href="@{/evento}" class="nav-link">Eventos</a>
+            <a th:href="@{/disciplina}" class="nav-link">Disciplinas</a>
+            <a th:href="@{/forum}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Fóruns</a>
         </div>
     </div>
 </nav>
@@ -21,13 +23,13 @@
 
         <div class="form-card">
             <div class="card-header-modern">
-                <h4>Registrar Participação</h4>
+                <h4>Registrar Fórum</h4>
             </div>
             <div class="card-body">
-                <form th:action="@{/participacao/salvar}" method="post">
+                <form th:action="@{/forum/salvar}" method="post">
                     <div class="form-group">
-                        <label class="form-label-modern">ID do Usuário</label>
-                        <input type="number" class="form-input" name="usuarioId" placeholder="Digite o ID do usuário" required>
+                        <label class="form-label-modern">ID do Aluno</label>
+                        <input type="number" class="form-input" name="alunoId" placeholder="Digite o ID do aluno" required>
                     </div>
 
                     <div class="form-group">
@@ -35,8 +37,18 @@
                         <input type="number" class="form-input" name="eventoId" placeholder="Digite o ID do evento" required>
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label-modern">ID da Disciplina</label>
+                        <input type="number" class="form-input" name="disciplinaId" placeholder="Digite o ID da disciplina" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-modern">Semestre</label>
+                        <input type="number" class="form-input" name="semestre" placeholder="Ex: 1" min="1" max="10" required>
+                    </div>
+
                     <div class="form-actions">
-                        <a th:href="@{/participacao}" class="btn-secondary-custom">Voltar</a>
+                        <a th:href="@{/forum}" class="btn-secondary-custom">Voltar</a>
                         <button type="submit" class="btn-primary-custom">Registrar</button>
                     </div>
                 </form>

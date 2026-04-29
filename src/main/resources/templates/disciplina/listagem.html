@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Eventos</title>
+    <title>Disciplinas</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -11,9 +11,9 @@
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
         <div class="d-flex gap-2">
             <a th:href="@{/usuario}" class="nav-link">Usuários</a>
-            <a th:href="@{/evento}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Eventos</a>
+            <a th:href="@{/evento}" class="nav-link">Eventos</a>
             <a th:href="@{/aluno}" class="nav-link">Alunos</a>
-            <a th:href="@{/disciplina}" class="nav-link">Disciplinas</a>
+            <a th:href="@{/disciplina}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Disciplinas</a>
         </div>
     </div>
 </nav>
@@ -23,8 +23,8 @@
     <div th:if="${message}" class="alert-modern alert-success" th:text="${message}"></div>
 
     <div class="page-header">
-        <h2>Lista de Eventos</h2>
-        <a th:href="@{/evento/formulario}" class="btn-primary-custom">+ Novo Evento</a>
+        <h2>Lista de Disciplinas</h2>
+        <a th:href="@{/disciplina/formulario}" class="btn-primary-custom">+ Nova Disciplina</a>
     </div>
 
     <div class="table-wrapper">
@@ -32,27 +32,29 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Título</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="e : ${lista}">
-                    <td th:text="${e.id}"></td>
-                    <td th:text="${e.titulo}"></td>
+                <tr th:each="d : ${lista}">
+                    <td th:text="${d.id}"></td>
+                    <td th:text="${d.nome}"></td>
+                    <td th:text="${d.descricao}"></td>
                     <td>
                         <div class="table-actions">
-                            <a th:href="@{'/evento/formulario/' + ${e.id}}" class="btn-edit">Editar</a>
-                            <a th:href="@{'/evento/delete/' + ${e.id}}" class="btn-danger-custom"
-                               onclick="return confirm('Excluir este evento?')">Excluir</a>
+                            <a th:href="@{'/disciplina/formulario/' + ${d.id}}" class="btn-edit">Editar</a>
+                            <a th:href="@{'/disciplina/delete/' + ${d.id}}" class="btn-danger-custom"
+                               onclick="return confirm('Excluir esta disciplina?')">Excluir</a>
                         </div>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(lista)}">
-                    <td colspan="3">
+                    <td colspan="4">
                         <div class="empty-state">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                            <p>Nenhum evento cadastrado.</p>
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                            <p>Nenhuma disciplina cadastrada.</p>
                         </div>
                     </td>
                 </tr>

@@ -1,0 +1,52 @@
+package trab.lesw.forum;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import trab.lesw.aluno.AlunoRepository;
+import trab.lesw.disciplina.DisciplinaRepository;
+import trab.lesw.evento.EventoRepository;
+
+@Service
+public class ForumService {
+
+    @Autowired
+    private ForumRepository repository;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
+
+    @Autowired
+    private EventoRepository eventoRepository;
+
+    @Autowired
+    private DisciplinaRepository disciplinaRepository;
+
+    public String registrar(Long alunoId, Long eventoId, Long disciplinaId, Integer semestre) {
+        Forum f = new Forum();
+        f.setAluno(alunoRepository.getReferenceById(alunoId));
+        f.setEvento(eventoRepository.getReferenceById(eventoId));
+        f.setDisciplina(disciplinaRepository.getReferenceById(disciplinaId));
+        f.setSemestre(semestre);
+        repository.save(f);
+        return "Fórum registrado!";
+    }
+
+    public List<Forum> getAll() {
+        return repository.findAllDetalhado();
+    }
+
+    public List<Forum> getByAluno(Long alunoId) {
+        return repository.findByAlunoId(alunoId);
+    }
+
+    public List<Forum> getByEvento(Long eventoId) {
+        return repository.findByEventoId(eventoId);
+    }
+
+    public List<Forum> getByDisciplina(Long disciplinaId) {
+        return repository.findByDisciplinaId(disciplinaId);
+    }
+}

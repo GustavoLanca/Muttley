@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Usuário</title>
+    <title>Competência</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -10,9 +10,9 @@
     <div class="container d-flex justify-content-between align-items-center">
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
         <div class="d-flex gap-2">
-            <a th:href="@{/usuario}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Usuários</a>
             <a th:href="@{/evento}" class="nav-link">Eventos</a>
-            <a th:href="@{/aluno}" class="nav-link">Alunos</a>
+            <a th:href="@{/tag}" class="nav-link">Tags</a>
+            <a th:href="@{/competencia}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Competências</a>
         </div>
     </div>
 </nav>
@@ -22,25 +22,23 @@
 
         <div class="form-card">
             <div class="card-header-modern">
-                <h4 th:text="${usuario?.id != null} ? 'Editar Usuário' : 'Novo Usuário'"></h4>
+                <h4>Nova Competência</h4>
             </div>
             <div class="card-body">
-                <form th:action="@{/usuario/salvar}" th:object="${usuario}" method="post">
-                    <input type="hidden" th:field="*{id}"/>
-
+                <form th:action="@{/competencia/salvar}" method="post">
                     <div class="form-group">
-                        <label class="form-label-modern">Nome</label>
-                        <input type="text" class="form-input" th:field="*{nome}" placeholder="Digite o nome" required>
+                        <label class="form-label-modern">ID da Tag</label>
+                        <input type="number" class="form-input" name="tagId" placeholder="Digite o ID da tag" required>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label-modern">Email</label>
-                        <input type="email" class="form-input" th:field="*{email}" placeholder="Digite o email" required>
+                        <label class="form-label-modern">ID do Evento</label>
+                        <input type="number" class="form-input" name="eventoId" placeholder="Digite o ID do evento" required>
                     </div>
 
                     <div class="form-actions">
-                        <a th:href="@{/usuario}" class="btn-secondary-custom">Voltar</a>
-                        <button type="submit" class="btn-primary-custom">Salvar</button>
+                        <a th:href="@{/competencia}" class="btn-secondary-custom">Voltar</a>
+                        <button type="submit" class="btn-primary-custom">Associar</button>
                     </div>
                 </form>
             </div>

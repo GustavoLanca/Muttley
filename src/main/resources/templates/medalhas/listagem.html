@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Medalhas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar-custom">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a th:href="@{/}" class="navbar-brand">Muttley</a>
+        <div class="d-flex gap-2">
+            <a th:href="@{/usuario}" class="nav-link">Usuários</a>
+            <a th:href="@{/evento}" class="nav-link">Eventos</a>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <div th:if="${message}" class="alert-modern alert-success" th:text="${message}"></div>
+
+    <div class="page-header">
+        <h2>Lista de Medalhas</h2>
+        <a th:href="@{/medalha/formulario}" class="btn-primary-custom">+ Nova Medalha</a>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="m : ${lista}">
+                    <td th:text="${m.id}"></td>
+                    <td>
+                        <span class="badge-custom badge-orange" th:text="${m.nome}"></span>
+                    </td>
+                    <td th:text="${m.usuario != null} ? ${m.usuario.nome} : 'Não atribuída'"></td>
+                    <td>
+                        <div class="table-actions">
+                            <a th:href="@{'/medalha/formulario/' + ${m.id}}" class="btn-edit">Editar</a>
+                            <a th:href="@{'/medalha/delete/' + ${m.id}}" class="btn-danger-custom"
+                               onclick="return confirm('Excluir esta medalha?')">Excluir</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(lista)}">
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.5 18.75h-9m9 0a3 3 0 013-3h-15a3 3 0 013 3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.04 6.04 0 01-2.77.832m5.25-6.324V2.721M16.27 9.728A6.02 6.02 0 0112 11.25a6.02 6.02 0 01-4.27-1.522"/></svg>
+                            <p>Nenhuma medalha cadastrada.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="footer">
+    <div class="container">
+        &copy; 2026 Muttley
+    </div>
+</div>
+
+</body>
+</html>

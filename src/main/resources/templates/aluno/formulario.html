@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Evento</title>
+    <title>Aluno</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -11,7 +11,7 @@
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
         <div class="d-flex gap-2">
             <a th:href="@{/usuario}" class="nav-link">Usuários</a>
-            <a th:href="@{/evento}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Eventos</a>
+            <a th:href="@{/aluno}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Alunos</a>
         </div>
     </div>
 </nav>
@@ -21,19 +21,24 @@
 
         <div class="form-card">
             <div class="card-header-modern">
-                <h4 th:text="${evento?.id != null} ? 'Editar Evento' : 'Novo Evento'"></h4>
+                <h4 th:text="${aluno?.id != null} ? 'Editar Aluno' : 'Novo Aluno'"></h4>
             </div>
             <div class="card-body">
-                <form th:action="@{/evento/salvar}" th:object="${evento}" method="post">
+                <form th:action="@{/aluno/salvar}" th:object="${aluno}" method="post">
                     <input type="hidden" th:field="*{id}"/>
 
                     <div class="form-group">
-                        <label class="form-label-modern">Título</label>
-                        <input type="text" class="form-input" th:field="*{titulo}" placeholder="Digite o título" required>
+                        <label class="form-label-modern">Nome</label>
+                        <input type="text" class="form-input" th:field="*{nome}" placeholder="Digite o nome" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-modern">Email</label>
+                        <input type="email" class="form-input" th:field="*{email}" placeholder="Digite o email" required>
                     </div>
 
                     <div class="form-actions">
-                        <a th:href="@{/evento}" class="btn-secondary-custom">Voltar</a>
+                        <a th:href="@{/aluno}" class="btn-secondary-custom">Voltar</a>
                         <button type="submit" class="btn-primary-custom">Salvar</button>
                     </div>
                 </form>
