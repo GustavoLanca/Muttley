@@ -21,9 +21,17 @@ public class CompetenciaService {
     private EventoRepository eventoRepository;
 
     public String associar(Long tagId, Long eventoId) {
+        var tagOpt = tagRepository.findById(tagId);
+        var eventoOpt = eventoRepository.findById(eventoId);
+        if (tagOpt.isEmpty()) {
+            return "Erro: Tag não encontrada!";
+        }
+        if (eventoOpt.isEmpty()) {
+            return "Erro: Evento não encontrado!";
+        }
         Competencia c = new Competencia();
-        c.setTag(tagRepository.getReferenceById(tagId));
-        c.setEvento(eventoRepository.getReferenceById(eventoId));
+        c.setTag(tagOpt.get());
+        c.setEvento(eventoOpt.get());
         repository.save(c);
         return "Competência associada!";
     }

@@ -21,10 +21,17 @@ public class ParticipacaoService {
     private EventoRepository eventoRepository;
 
     public String participar(Long usuarioId, Long eventoId) {
-
+        var usuarioOpt = usuarioRepository.findById(usuarioId);
+        var eventoOpt = eventoRepository.findById(eventoId);
+        if (usuarioOpt.isEmpty()) {
+            return "Erro: Usuário não encontrado!";
+        }
+        if (eventoOpt.isEmpty()) {
+            return "Erro: Evento não encontrado!";
+        }
         Participacao p = new Participacao();
-        p.setUsuario(usuarioRepository.getReferenceById(usuarioId));
-        p.setEvento(eventoRepository.getReferenceById(eventoId));
+        p.setUsuario(usuarioOpt.get());
+        p.setEvento(eventoOpt.get());
         repository.save(p);
 
         return "Participação registrada!";

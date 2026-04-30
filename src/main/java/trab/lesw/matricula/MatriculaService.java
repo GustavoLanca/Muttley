@@ -21,9 +21,17 @@ public class MatriculaService {
     private DisciplinaRepository disciplinaRepository;
 
     public String matricular(Long alunoId, Long disciplinaId) {
+        var alunoOpt = alunoRepository.findById(alunoId);
+        var disciplinaOpt = disciplinaRepository.findById(disciplinaId);
+        if (alunoOpt.isEmpty()) {
+            return "Erro: Aluno não encontrado!";
+        }
+        if (disciplinaOpt.isEmpty()) {
+            return "Erro: Disciplina não encontrada!";
+        }
         Matricula m = new Matricula();
-        m.setAluno(alunoRepository.getReferenceById(alunoId));
-        m.setDisciplina(disciplinaRepository.getReferenceById(disciplinaId));
+        m.setAluno(alunoOpt.get());
+        m.setDisciplina(disciplinaOpt.get());
         repository.save(m);
         return "Matrícula realizada!";
     }

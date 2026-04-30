@@ -25,10 +25,22 @@ public class ForumService {
     private DisciplinaRepository disciplinaRepository;
 
     public String registrar(Long alunoId, Long eventoId, Long disciplinaId, Integer semestre) {
+        var alunoOpt = alunoRepository.findById(alunoId);
+        var eventoOpt = eventoRepository.findById(eventoId);
+        var disciplinaOpt = disciplinaRepository.findById(disciplinaId);
+        if (alunoOpt.isEmpty()) {
+            return "Erro: Aluno não encontrado!";
+        }
+        if (eventoOpt.isEmpty()) {
+            return "Erro: Evento não encontrado!";
+        }
+        if (disciplinaOpt.isEmpty()) {
+            return "Erro: Disciplina não encontrada!";
+        }
         Forum f = new Forum();
-        f.setAluno(alunoRepository.getReferenceById(alunoId));
-        f.setEvento(eventoRepository.getReferenceById(eventoId));
-        f.setDisciplina(disciplinaRepository.getReferenceById(disciplinaId));
+        f.setAluno(alunoOpt.get());
+        f.setEvento(eventoOpt.get());
+        f.setDisciplina(disciplinaOpt.get());
         f.setSemestre(semestre);
         repository.save(f);
         return "Fórum registrado!";
