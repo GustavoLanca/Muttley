@@ -11,27 +11,29 @@ import trab.lesw.evento.EventoRepository;
 @Service
 public class ParticipacaoService {
 
-    @Autowired
-    private ParticipacaoRepository repository;
+	@Autowired
+	private ParticipacaoRepository repository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private EventoRepository eventoRepository;
+	@Autowired
+	private EventoRepository eventoRepository;
 
-    public String participar(Long usuarioId, Long eventoId) {
+	public String participar(Long usuarioId, Long eventoId) {
+		if (repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
+			return "Usuário já está inscrito nesse evento!";
+		}
+		Participacao p = new Participacao();
+		p.setUsuario(usuarioRepository.getReferenceById(usuarioId));
+		p.setEvento(eventoRepository.getReferenceById(eventoId));
+		repository.save(p);
 
-        Participacao p = new Participacao();
-        p.setUsuario(usuarioRepository.getReferenceById(usuarioId));
-        p.setEvento(eventoRepository.getReferenceById(eventoId));
-        repository.save(p);
+		return "Participação registrada!";
+	}
 
-        return "Participação registrada!";
-    }
+	public List<Participacao> getAll() {
+		return repository.findAllUsuarioEvento();
+	}
 
-    public List<Participacao> getAll() {
-        return repository.findAllUsuarioEvento();
-    }
-    
 }

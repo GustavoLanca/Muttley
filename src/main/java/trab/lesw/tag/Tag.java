@@ -1,37 +1,39 @@
-package trab.lesw.usuario;
+package trab.lesw.tag;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import trab.lesw.evento.Evento;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "tag")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Usuario implements Serializable {
+public class Tag implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 1L;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
     
-    private String email;
-    
-    private String tipo;
+    @ManyToMany(mappedBy = "tags")
+    private List<Evento> eventos = new ArrayList<>();
 }

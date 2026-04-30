@@ -7,12 +7,20 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import trab.lesw.evento.EventoRepository;
+import trab.lesw.usuario.UsuarioRepository;
+
 @Controller
 @RequestMapping("/participacao")
 public class ParticipacaoController {
 
     @Autowired
     private ParticipacaoService service;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private EventoRepository eventoRepository;
+    
     
     @GetMapping
     public String listar(Model model) {
@@ -21,7 +29,9 @@ public class ParticipacaoController {
     }
 
     @GetMapping("/formulario")
-    public String formulario() {
+    public String formulario(Model model) {
+        model.addAttribute("usuarios", usuarioRepository.findAll());
+        model.addAttribute("eventos", eventoRepository.findAll());
         return "participacao/formulario";
     }
 

@@ -21,10 +21,9 @@ public class UsuarioService {
     }
 
     public String save(Usuario usuario) {
-        repository.save(usuario);
-        return usuario.getId() != null ?
-                "Usuário atualizado com sucesso!" :
-                "Usuário criado com sucesso!";
+    	boolean isNovo = usuario.getId() == null;
+    	repository.save(usuario);
+    	return isNovo ? "Usuário criado com sucesso!" : "Usuário atualizado com sucesso!";
     }
 
     public String delete(Long id) {

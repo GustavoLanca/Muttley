@@ -20,6 +20,7 @@
                         <th>ID</th>
                         <th>Nome</th>
                         <th>Email</th>
+                        <th>Tipo</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -28,6 +29,7 @@
                         <td th:text="${u.id}"></td>
                         <td th:text="${u.nome}"></td>
                         <td th:text="${u.email}"></td>
+                        <td th:text="${u.tipo}"></td>
                         <td>
                             <a th:href="@{'/usuario/formulario/' + ${u.id}}" class="btn btn-sm btn-outline-primary">Editar</a>
                             <a th:href="@{'/usuario/delete/' + ${u.id}}" class="btn btn-sm btn-outline-danger"

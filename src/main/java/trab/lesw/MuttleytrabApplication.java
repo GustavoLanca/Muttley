@@ -7,6 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MuttleytrabApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MuttleytrabApplication.class, args);
+		SpringApplication.run(MuttleytrabApplication.class, args);	
 	}
 }
