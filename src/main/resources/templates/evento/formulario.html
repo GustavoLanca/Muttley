@@ -7,12 +7,13 @@
 <body>
 
 <nav class="navbar-custom">
-    <div class="container d-flex justify-content-between align-items-center">
+    <div class="container">
+        <a href="#" class="btn-back" onclick="history.back(); return false;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            Voltar
+        </a>
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
-        <div class="d-flex gap-2">
-            <a th:href="@{/usuario}" class="nav-link">Usuários</a>
-            <a th:href="@{/evento}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Eventos</a>
-        </div>
+        <div></div>
     </div>
 </nav>
 
@@ -23,21 +24,39 @@
             <div class="card-header-modern">
                 <h4 th:text="${evento?.id != null} ? 'Editar Evento' : 'Novo Evento'"></h4>
             </div>
-            <div class="card-body">
-                <form th:action="@{/evento/salvar}" th:object="${evento}" method="post">
-                    <input type="hidden" th:field="*{id}"/>
+<div class="card-body">
+    <form th:action="@{/evento/salvar}" th:object="${evento}" method="post">
+        <input type="hidden" th:field="*{id}"/>
 
-                    <div class="form-group">
-                        <label class="form-label-modern">Título</label>
-                        <input type="text" class="form-input" th:field="*{titulo}" placeholder="Digite o título" required>
-                    </div>
+        <div class="form-group">
+            <label class="form-label-modern">Título</label>
+            <input type="text" class="form-input" th:field="*{titulo}" placeholder="Digite o título" required>
+        </div>
 
-                    <div class="form-actions">
-                        <a th:href="@{/evento}" class="btn-secondary-custom">Voltar</a>
-                        <button type="submit" class="btn-primary-custom">Salvar</button>
-                    </div>
-                </form>
-            </div>
+<div class="form-group">
+    <label class="form-label-modern">Tipo do Evento</label>
+    <select class="form-input" th:field="*{tipoEvento}" required>
+        <option value="">Selecione o tipo</option>
+        <option th:each="tipo : ${tiposEvento}"
+                th:value="${tipo}"
+                th:text="${tipo.descricao + ' (' + tipo.pontos + ' pts)'}"></option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label class="form-label-modern">Competências</label>
+    <select class="form-input" th:field="*{competencias}" multiple required>
+        <option th:each="c : ${competencias}" th:value="${c.id}" th:text="${c.nome}"></option>
+    </select>
+    <small style="color: var(--text-light); font-size: 0.8rem;">Segure Ctrl para selecionar múltiplas competências</small>
+</div>
+
+        <div class="form-actions">
+            <a th:href="@{/evento}" class="btn-secondary-custom">Voltar</a>
+            <button type="submit" class="btn-primary-custom">Salvar</button>
+        </div>
+    </form>
+</div>
         </div>
 
     </div>

@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.*;
 import lombok.*;
 import trab.lesw.matricula.Matricula;
+import trab.lesw.usuario.Usuario;
 
 @Entity
 @Table(name = "aluno")
@@ -28,4 +29,8 @@ public class Aluno implements Serializable {
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Matricula> matriculas;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 }

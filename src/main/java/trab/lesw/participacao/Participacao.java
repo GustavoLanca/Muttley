@@ -30,4 +30,6 @@ public class Participacao implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evento_id")
     private Evento evento;
+
+    private Integer pontos;
 }

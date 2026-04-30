@@ -7,12 +7,13 @@
 <body>
 
 <nav class="navbar-custom">
-    <div class="container d-flex justify-content-between align-items-center">
+    <div class="container">
+        <a href="#" class="btn-back" onclick="history.back(); return false;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            Voltar
+        </a>
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
-        <div class="d-flex gap-2">
-            <a th:href="@{/usuario}" class="nav-link">Usuários</a>
-            <a th:href="@{/evento}" class="nav-link">Eventos</a>
-        </div>
+        <div></div>
     </div>
 </nav>
 
@@ -32,6 +33,7 @@
                     <th>ID</th>
                     <th>Usuário</th>
                     <th>Evento</th>
+                    <th>Pontos</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +44,9 @@
                     </td>
                     <td>
                         <span class="badge-custom badge-green" th:text="${p.evento.titulo}"></span>
+                    </td>
+                    <td>
+                        <span class="badge-custom badge-orange" th:text="${p.pontos} + ' pts'"></span>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(lista)}">

@@ -14,12 +14,29 @@ public class AlunoService {
     @Autowired
     private AlunoRepository repository;
 
+    @Transactional
     public List<Aluno> getAll() {
-        return repository.findAll(Sort.by("nome").ascending());
+        List<Aluno> alunos = repository.findAllWithUsuario();
+        alunos.forEach(a -> {
+            if (a.getUsuario() != null && a.getUsuario().getMedalhas() != null) {
+                a.getUsuario().getMedalhas().size();
+            }
+        });
+        return alunos;
     }
 
+    @Transactional
     public Aluno getById(Long id) {
-        return repository.getReferenceById(id);
+        Aluno aluno = repository.getReferenceById(id);
+        if (aluno.getUsuario() != null) {
+            if (aluno.getUsuario().getParticipacoes() != null) {
+                aluno.getUsuario().getParticipacoes().size();
+            }
+            if (aluno.getUsuario().getMedalhas() != null) {
+                aluno.getUsuario().getMedalhas().size();
+            }
+        }
+        return aluno;
     }
 
     @Transactional

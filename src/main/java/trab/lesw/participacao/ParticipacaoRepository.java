@@ -10,6 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface ParticipacaoRepository extends JpaRepository<Participacao, Long> {
-    @Query("SELECT p FROM Participacao p JOIN FETCH p.usuario JOIN FETCH p.evento")
+    @Query("SELECT DISTINCT p FROM Participacao p LEFT JOIN FETCH p.usuario LEFT JOIN FETCH p.evento")
     List<Participacao> findAllUsuarioEvento();
 }

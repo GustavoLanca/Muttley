@@ -26,6 +26,8 @@ public class Disciplina implements Serializable {
 
     private String descricao;
 
+    private Integer semestre;
+
     @OneToMany(mappedBy = "disciplina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Matricula> matriculas;
 }

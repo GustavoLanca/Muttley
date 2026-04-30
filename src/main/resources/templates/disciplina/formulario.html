@@ -7,11 +7,13 @@
 <body>
 
 <nav class="navbar-custom">
-    <div class="container d-flex justify-content-between align-items-center">
+    <div class="container">
+        <a href="#" class="btn-back" onclick="history.back(); return false;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            Voltar
+        </a>
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
-        <div class="d-flex gap-2">
-            <a th:href="@{/disciplina}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Disciplinas</a>
-        </div>
+        <div></div>
     </div>
 </nav>
 
@@ -34,6 +36,11 @@
                     <div class="form-group">
                         <label class="form-label-modern">Descrição</label>
                         <textarea class="form-input" th:field="*{descricao}" placeholder="Digite a descrição" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-modern">Semestre</label>
+                        <input type="number" class="form-input" th:field="*{semestre}" placeholder="Digite o semestre" min="1" required>
                     </div>
 
                     <div class="form-actions">
