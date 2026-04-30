@@ -1,4 +1,4 @@
-package trab.lesw.usuario;
+﻿package trab.lesw.usuario;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import trab.lesw.medalhas.Medalha;
 import trab.lesw.participacao.Participacao;
+import trab.lesw.aluno.Aluno;
 
 @Entity
 @Table(name = "usuario")
@@ -32,6 +33,9 @@ public class Usuario implements Serializable {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Medalha> medalhas;
+
+    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private Aluno aluno;
 
     public int getTotalPontos() {
         if (participacoes == null) return 0;

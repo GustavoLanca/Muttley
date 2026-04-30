@@ -6,18 +6,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioRepository repository;
 
+    @Transactional
     public List<Usuario> getAll() {
-        return repository.findAll(Sort.by("nome").ascending());
+        List<Usuario> usuarios = repository.findAll(Sort.by("nome").ascending());
+        usuarios.forEach(u -> {
+            if (u.getParticipacoes() != null) {
+                u.getParticipacoes().size();
+            }
+            if (u.getMedalhas() != null) {
+                u.getMedalhas().size();
+            }
+        });
+        return usuarios;
     }
 
+    @Transactional
     public Usuario getById(Long id) {
-        return repository.getReferenceById(id);
+        Usuario usuario = repository.getReferenceById(id);
+        if (usuario.getParticipacoes() != null) {
+            usuario.getParticipacoes().size();
+        }
+        if (usuario.getMedalhas() != null) {
+            usuario.getMedalhas().size();
+        }
+        return usuario;
     }
 
     public String save(Usuario usuario) {
