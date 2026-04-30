@@ -17,4 +17,7 @@ public interface UsuarioRepository extends JpaRepository <Usuario, Long> {
 
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.medalhas WHERE u.id = :id")
     Usuario findByIdWithMedalhas(@Param("id") Long id);
+
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.medalhas ORDER BY u.nome ASC")
+    List<Usuario> findAllWithMedalhas();
 }

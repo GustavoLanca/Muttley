@@ -7,14 +7,13 @@
 <body>
 
 <nav class="navbar-custom">
-    <div class="container d-flex justify-content-between align-items-center">
+    <div class="container">
+        <a href="#" class="btn-back" onclick="history.back(); return false;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            Voltar
+        </a>
         <a th:href="@{/}" class="navbar-brand">Muttley</a>
-        <div class="d-flex gap-2">
-            <a th:href="@{/usuario}" class="nav-link" style="color: var(--primary); background: rgba(99,102,241,0.08);">Usuários</a>
-            <a th:href="@{/evento}" class="nav-link">Eventos</a>
-            <a th:href="@{/aluno}" class="nav-link">Alunos</a>
-            <a th:href="@{/disciplina}" class="nav-link">Disciplinas</a>
-        </div>
+        <div></div>
     </div>
 </nav>
 

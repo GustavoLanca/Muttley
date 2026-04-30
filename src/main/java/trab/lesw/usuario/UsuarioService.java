@@ -16,13 +16,10 @@ public class UsuarioService {
 
     @Transactional
     public List<Usuario> getAll() {
-        List<Usuario> usuarios = repository.findAll(Sort.by("nome").ascending());
+        List<Usuario> usuarios = repository.findAllWithMedalhas();
         usuarios.forEach(u -> {
             if (u.getParticipacoes() != null) {
                 u.getParticipacoes().size();
-            }
-            if (u.getMedalhas() != null) {
-                u.getMedalhas().size();
             }
         });
         return usuarios;
