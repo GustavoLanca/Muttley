@@ -15,21 +15,41 @@
 					th:text="${usuario.id != null} ? 'Editar Usuário' : 'Novo Usuário'"></h4>
 			</div>
 			<div class="card-body">
+
 				<form th:action="@{/usuario/salvar}" th:object="${usuario}"
-					method="post">
+					method="post" novalidate onsubmit="return validarFormUsuario(this)">
 
 					<input type="hidden" th:field="*{id}" />
 
 					<div class="mb-3">
-						<label class="form-label fw-semibold">Nome</label> <input
+						<label class="form-label fw-semibold">Nome Completo</label> <input
 							type="text" class="form-control" th:field="*{nome}"
-							placeholder="Digite o nome" required>
+							id="nomeUsuario" placeholder="Digite o nome completo"
+							maxlength="100" required>
+						<div class="invalid-feedback">Informe nome e sobrenome,
+							somente letras (mín. 5 caracteres).</div>
 					</div>
 
 					<div class="mb-3">
-						<label class="form-label fw-semibold">Email</label> <input
+						<label class="form-label fw-semibold">E-mail</label> <input
 							type="text" class="form-control" th:field="*{email}"
-							placeholder="Digite o email" required>
+							id="emailUsuario" placeholder="exemplo@email.com" maxlength="150"
+							required>
+						<div class="invalid-feedback">E-mail inválido. Informe um
+							e-mail válido (ex: nome@dominio.com).</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-semibold">Tipo de Usuário</label> <select
+							class="form-select" th:field="*{tipo}" id="tipoUsuario" required>
+							<option value="">Selecione...</option>
+							<option value="ALUNO">Aluno</option>
+							<option value="PROFESSOR">Professor</option>
+							<option value="ORGANIZADOR">Organizador</option>
+							<option value="EXTERNO">Externo</option>
+						</select>
+						<div class="invalid-feedback">Selecione um tipo de usuário.
+						</div>
 					</div>
 
 					<div class="d-flex justify-content-between">
@@ -37,20 +57,9 @@
 						<button type="submit" class="btn btn-primary">Salvar</button>
 					</div>
 
-					<div class="mb-3">
-						<label class="form-label fw-semibold">Tipo</label> <select
-							class="form-select" th:field="*{tipo}" required>
-							<option value="ALUNO">Aluno</option>
-							<option value="PROFESSOR">Professor</option>
-							<option value="ORGANIZADOR">Organizador</option>
-							<option value="EXTERNO">Externo</option>
-						</select>
-					</div>
-
 				</form>
 			</div>
 		</div>
 	</div>
-
 </body>
 </html>
