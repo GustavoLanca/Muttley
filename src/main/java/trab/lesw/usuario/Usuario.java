@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import trab.lesw.medalha.Medalha;
+import trab.lesw.participacao.Participacao;
 
 
 @Entity
@@ -40,4 +41,7 @@ public class Usuario implements Serializable {
 
     @OneToMany(mappedBy = "usuario")
     private List<Medalha> medalhas;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Participacao> participacoes;
 }

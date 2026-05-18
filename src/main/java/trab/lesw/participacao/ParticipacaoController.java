@@ -45,4 +45,12 @@ public class ParticipacaoController {
 
         return "redirect:/participacao";
     }
+
+    @GetMapping("/pontos/{usuarioId}")
+    public String verPontos(@PathVariable Long usuarioId, Model model) {
+        model.addAttribute("usuario", usuarioRepository.getReferenceById(usuarioId));
+        model.addAttribute("totalPontos", service.calcularTotalPontos(usuarioId));
+        model.addAttribute("participacoes", service.getAll());
+        return "participacao/pontos";
+    }
 }

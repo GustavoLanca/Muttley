@@ -25,6 +25,7 @@
 							<th>Descrição</th>
 							<th>Tipo</th>
 							<th>Data</th>
+							<th>Pontos</th>
 							<th>Ações</th>
 						</tr>
 					</thead>
@@ -35,6 +36,7 @@
 							<td th:text="${e.descricao}"></td>
 							<td th:text="${e.tipo}"></td>
 							<td th:text="${#temporals.format(e.data, 'dd/MM/yyyy HH:mm')}"></td>
+							<td th:text="${e.pontos}"></td>
 							<td><a th:href="@{'/evento/formulario/' + ${e.id}}"
 								class="btn btn-sm btn-outline-primary">Editar</a> <a
 								th:href="@{'/evento/delete/' + ${e.id}}"

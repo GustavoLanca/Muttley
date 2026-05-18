@@ -13,6 +13,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -46,6 +47,10 @@ public class Evento implements Serializable {
     private String tipo;
     
     private LocalDateTime data;
+
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
+    private Integer pontos = 0;
+
     @ManyToMany
     @JoinTable(
         name = "evento_tag",

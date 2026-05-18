@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import trab.lesw.disciplina.Disciplina;
+import trab.lesw.disciplina.DisciplinaRepository;
 import trab.lesw.tag.Tag;
 import trab.lesw.tag.TagRepository;
 @Service
@@ -17,6 +19,10 @@ public class EventoService {
     
     @Autowired
     private TagRepository tagRepository;
+
+    @Autowired
+    private DisciplinaRepository disciplinaRepository;
+
     public List<Evento> getAll() {
         return eventoRepository.findAll(Sort.by("data").descending());
     }
@@ -31,6 +37,12 @@ public class EventoService {
             evento.setTags(tags);
         } else {
             evento.setTags(new ArrayList<>());
+        }
+        if (evento.getDisciplina() != null && evento.getDisciplina().getId() != null) {
+            Disciplina disciplina = disciplinaRepository.getReferenceById(evento.getDisciplina().getId());
+            evento.setDisciplina(disciplina);
+        } else {
+            evento.setDisciplina(null);
         }
         eventoRepository.save(evento);
         return "Evento salvo!";

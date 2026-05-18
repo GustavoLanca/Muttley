@@ -57,6 +57,18 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Pontos</label>
+                    <input type="number"
+                           class="form-control"
+                           th:field="*{pontos}"
+                           id="pontosEvento"
+                           placeholder="Ex: 100"
+                           min="0"
+                           required>
+                    <div class="invalid-feedback">Informe quantos pontos vale este evento.</div>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Tipo</label>
                     <select class="form-select" th:field="*{tipo}" id="tipoEvento" required>
                         <option value="">Selecione o tipo...</option>
