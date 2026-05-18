@@ -29,7 +29,7 @@ public class ParticipacaoService {
 		Participacao p = new Participacao();
 		p.setUsuario(usuarioRepository.getReferenceById(usuarioId));
 		p.setEvento(evento);
-		p.setPontosGanhos(evento.getPontos());
+		p.setPontosObtidos(evento.getPontos());
 		repository.save(p);
 
 		return "Participação registrada!";
