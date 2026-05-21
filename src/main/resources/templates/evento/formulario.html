@@ -42,33 +42,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Carga Horária (horas)</label>
-                    <input type="number"
-                           class="form-control"
-                           th:field="*{cargaHoraria}"
-                           id="cargaHoraria"
-                           placeholder="Ex: 4"
-                           min="1"
-                           max="999"
-                           required>
-                    <div class="invalid-feedback">
-                        Carga horária inválida. Informe um número entre 1 e 999.
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Pontos</label>
-                    <input type="number"
-                           class="form-control"
-                           th:field="*{pontos}"
-                           id="pontosEvento"
-                           placeholder="Ex: 100"
-                           min="0"
-                           required>
-                    <div class="invalid-feedback">Informe quantos pontos vale este evento.</div>
-                </div>
-
-                <div class="mb-3">
                     <label class="form-label fw-semibold">Tipo</label>
                     <select class="form-select" th:field="*{tipo}" id="tipoEvento" required>
                         <option value="">Selecione o tipo...</option>
@@ -81,14 +54,45 @@
                     <div class="invalid-feedback">Selecione o tipo do evento.</div>
                 </div>
 
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Data</label>
+                        <input type="date"
+                               class="form-control"
+                               th:field="*{data}"
+                               id="dataEvento"
+                               required>
+                        <div class="invalid-feedback">Informe uma data válida.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Início</label>
+                        <input type="time"
+                               class="form-control"
+                               th:field="*{horaInicio}"
+                               id="horaInicio"
+                               required>
+                        <div class="invalid-feedback">Informe o horário de início.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Encerramento</label>
+                        <input type="time"
+                               class="form-control"
+                               th:field="*{horaFim}"
+                               id="horaFim"
+                               required>
+                        <div class="invalid-feedback">Informe o horário de encerramento.</div>
+                    </div>
+                </div>
+
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Data e Hora</label>
-                    <input type="datetime-local"
+                    <label class="form-label fw-semibold">Nome da Medalha</label>
+                    <input type="text"
                            class="form-control"
-                           th:field="*{data}"
-                           id="dataEvento"
-                           required>
-                    <div class="invalid-feedback">Informe uma data válida.</div>
+                           th:field="*{medalhaNome}"
+                           id="medalhaNome"
+                           placeholder="Ex: Medalha de Ouro - Metodologia Ágil"
+                           maxlength="255">
+                    <div class="form-text">Deixe em branco se o evento não conceder medalha.</div>
                 </div>
 
                 <div class="mb-3">
@@ -102,9 +106,50 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Organizadores</label>
+                    <input type="text" class="form-control mb-1 busca-participante"
+                           placeholder="Buscar organizador..."
+                           oninput="filtrarParticipante(this, 'select-organizadores')">
+                    <select class="form-select select-organizadores" name="organizadores" multiple size="4">
+                        <option th:each="o : ${organizadores}" th:value="${o.id}"
+                            th:text="${o.nome}"
+                            th:selected="${evento.organizadores != null and evento.organizadores.contains(o)}"></option>
+                    </select>
+                    <div class="form-text">Segure Ctrl para selecionar vários.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Palestrantes</label>
+                    <input type="text" class="form-control mb-1 busca-participante"
+                           placeholder="Buscar palestrante..."
+                           oninput="filtrarParticipante(this, 'select-palestrantes')">
+                    <select class="form-select select-palestrantes" name="palestrantes" multiple size="4">
+                        <option th:each="p : ${palestrantes}" th:value="${p.id}"
+                            th:text="${p.nome}"
+                            th:selected="${evento.palestrantes != null and evento.palestrantes.contains(p)}"></option>
+                    </select>
+                    <div class="form-text">Segure Ctrl para selecionar vários.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Professores</label>
+                    <input type="text" class="form-control mb-1 busca-participante"
+                           placeholder="Buscar professor..."
+                           oninput="filtrarParticipante(this, 'select-professores')">
+                    <select class="form-select select-professores" name="professores" multiple size="4">
+                        <option th:each="p : ${professores}" th:value="${p.id}"
+                            th:text="${p.nome}"
+                            th:selected="${evento.professores != null and evento.professores.contains(p)}"></option>
+                    </select>
+                    <div class="form-text">Segure Ctrl para selecionar vários.</div>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Tags / Competências</label>
-                    <div class="border rounded p-3 bg-white">
-                        <div th:each="t : ${tags}" class="form-check form-check-inline">
+                    <input type="text" class="form-control mb-2" id="buscaTag"
+                           placeholder="Buscar tag..." oninput="filtrarTags()">
+                    <div class="border rounded p-3 bg-white" id="containerTags">
+                        <div th:each="t : ${tags}" class="form-check form-check-inline tag-item">
                             <input class="form-check-input"
                                    type="checkbox"
                                    name="tags"
@@ -127,5 +172,31 @@
         </div>
     </div>
 </div>
+<script>
+function filtrarTags() {
+    var busca = document.getElementById('buscaTag').value.toLowerCase();
+    var itens = document.querySelectorAll('#containerTags .tag-item');
+    itens.forEach(function(item) {
+        var label = item.querySelector('label');
+        if (label && label.textContent.toLowerCase().includes(busca)) {
+            item.style.display = 'inline-block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+function filtrarParticipante(input, selectClass) {
+    var busca = input.value.toLowerCase();
+    var select = document.querySelector('.' + selectClass);
+    var options = select.querySelectorAll('option');
+    options.forEach(function(opt) {
+        if (opt.textContent.toLowerCase().includes(busca)) {
+            opt.style.display = 'block';
+        } else {
+            opt.style.display = 'none';
+        }
+    });
+}
+</script>
 </body>
 </html>

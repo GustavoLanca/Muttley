@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Participação Confirmada</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5" style="max-width: 500px;">
+	<div class="card shadow-sm">
+		<div class="card-header bg-success text-white text-center">
+			<h4 class="mb-0">Participação Confirmada!</h4>
+		</div>
+		<div class="card-body text-center">
+
+			<div class="mb-4">
+				<h5 th:text="${evento.titulo}"></h5>
+				<p class="text-muted">Sua participação foi registrada com sucesso.</p>
+			</div>
+
+			<a th:href="${downloadUrl}" class="btn btn-success btn-lg mb-3">Baixar Certificado</a>
+
+			<div>
+				<a th:href="@{/}" class="btn btn-secondary">Voltar ao início</a>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

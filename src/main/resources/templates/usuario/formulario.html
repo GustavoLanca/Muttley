@@ -32,11 +32,35 @@
 
 					<div class="mb-3">
 						<label class="form-label fw-semibold">E-mail</label> <input
-							type="text" class="form-control" th:field="*{email}"
+							type="email" class="form-control" th:field="*{email}"
 							id="emailUsuario" placeholder="exemplo@email.com" maxlength="150"
 							required>
 						<div class="invalid-feedback">E-mail inválido. Informe um
 							e-mail válido (ex: nome@dominio.com).</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-semibold">Senha</label> <input
+							type="password" class="form-control" th:field="*{senha}"
+							id="senhaUsuario" placeholder="Digite a senha" maxlength="100"
+							required>
+						<div class="invalid-feedback">Informe uma senha.</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-semibold">CPF</label> <input
+							type="text" class="form-control" th:field="*{cpf}"
+							id="cpfUsuario" placeholder="000.000.000-00" maxlength="14"
+							required>
+						<div class="invalid-feedback">Informe um CPF válido.</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-semibold">LinkedIn</label> <input
+							type="url" class="form-control" th:field="*{linkedin}"
+							id="linkedinUsuario" placeholder="https://linkedin.com/in/seu-perfil"
+							maxlength="255">
+						<div class="invalid-feedback">Informe uma URL válida.</div>
 					</div>
 
 					<div class="mb-3">
@@ -46,6 +70,7 @@
 							<option value="ALUNO">Aluno</option>
 							<option value="PROFESSOR">Professor</option>
 							<option value="ORGANIZADOR">Organizador</option>
+							<option value="PALESTRANTE">Palestrante</option>
 							<option value="EXTERNO">Externo</option>
 						</select>
 						<div class="invalid-feedback">Selecione um tipo de usuário.

@@ -11,6 +11,9 @@ import trab.lesw.disciplina.Disciplina;
 import trab.lesw.disciplina.DisciplinaRepository;
 import trab.lesw.tag.Tag;
 import trab.lesw.tag.TagRepository;
+import trab.lesw.usuario.Usuario;
+import trab.lesw.usuario.UsuarioRepository;
+
 @Service
 public class EventoService {
 
@@ -23,6 +26,9 @@ public class EventoService {
     @Autowired
     private DisciplinaRepository disciplinaRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public List<Evento> getAll() {
         return eventoRepository.findAll(Sort.by("data").descending());
     }
@@ -31,7 +37,7 @@ public class EventoService {
         return eventoRepository.getReferenceById(id);
     }
 
-    public String save(Evento evento, List<Long> tagIds) {
+    public String save(Evento evento, List<Long> tagIds, List<Long> organizadorIds, List<Long> palestranteIds, List<Long> professorIds) {
         if (tagIds != null && !tagIds.isEmpty()) {
             List<Tag> tags = tagRepository.findAllById(tagIds);
             evento.setTags(tags);
@@ -44,6 +50,22 @@ public class EventoService {
         } else {
             evento.setDisciplina(null);
         }
+        if (organizadorIds != null && !organizadorIds.isEmpty()) {
+            evento.setOrganizadores(usuarioRepository.findAllById(organizadorIds));
+        } else {
+            evento.setOrganizadores(new ArrayList<>());
+        }
+        if (palestranteIds != null && !palestranteIds.isEmpty()) {
+            evento.setPalestrantes(usuarioRepository.findAllById(palestranteIds));
+        } else {
+            evento.setPalestrantes(new ArrayList<>());
+        }
+        if (professorIds != null && !professorIds.isEmpty()) {
+            evento.setProfessores(usuarioRepository.findAllById(professorIds));
+        } else {
+            evento.setProfessores(new ArrayList<>());
+        }
+        evento.setPontos(1);
         eventoRepository.save(evento);
         return "Evento salvo!";
     }

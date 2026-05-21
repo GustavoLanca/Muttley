@@ -1,7 +1,8 @@
 package trab.lesw.evento;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import trab.lesw.disciplina.Disciplina;
 import trab.lesw.tag.Tag;
+import trab.lesw.usuario.Usuario;
 
 @Entity
 @Table(name = "evento")
@@ -42,14 +43,17 @@ public class Evento implements Serializable {
     
     private String descricao;
     
-    private int cargaHoraria;
-    
     private String tipo;
     
-    private LocalDateTime data;
+    private LocalDate data;
 
-    @Column(columnDefinition = "INTEGER DEFAULT 0")
-    private Integer pontos = 0;
+    private LocalTime horaInicio;
+
+    private LocalTime horaFim;
+
+    private Integer pontos = 1;
+
+    private String medalhaNome;
 
     @ManyToMany
     @JoinTable(
@@ -62,4 +66,28 @@ public class Evento implements Serializable {
     @ManyToOne
     @JoinColumn(name = "disciplina_id")
     private Disciplina disciplina;
+
+    @ManyToMany
+    @JoinTable(
+        name = "evento_organizador",
+        joinColumns = @JoinColumn(name = "evento_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> organizadores = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "evento_palestrante",
+        joinColumns = @JoinColumn(name = "evento_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> palestrantes = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "evento_professor",
+        joinColumns = @JoinColumn(name = "evento_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> professores = new ArrayList<>();
 }

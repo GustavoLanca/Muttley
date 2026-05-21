@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import trab.lesw.evento.Evento;
 import trab.lesw.usuario.Usuario;
 
 @Entity
@@ -36,4 +37,8 @@ public class Medalha implements Serializable {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "evento_id")
+    private Evento evento;
 }

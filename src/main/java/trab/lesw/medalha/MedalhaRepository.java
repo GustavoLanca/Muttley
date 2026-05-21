@@ -1,4 +1,4 @@
-package trab.lesw.disciplina;
+package trab.lesw.medalha;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface DisciplinaRepository extends JpaRepository<Disciplina, Long> {
-	List<Disciplina> findByProfessorId(Long professorId);
+public interface MedalhaRepository extends JpaRepository<Medalha, Long> {
+    List<Medalha> findByUsuarioId(Long usuarioId);
+    long countByUsuarioIdAndNome(Long usuarioId, String nome);
 }

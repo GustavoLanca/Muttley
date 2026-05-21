@@ -22,26 +22,32 @@
 						<tr>
 							<th>ID</th>
 							<th>Nome</th>
-							<th>Email</th>
 							<th>Tipo</th>
-							<th>Total Pontos</th>
 							<th>Ações</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="u : ${lista}">
+						<tr th:each="u : ${lista}"
+							data-id="${u.id}"
+							data-nome="${u.nome}"
+							data-email="${u.email}"
+							data-cpf="${u.cpf}"
+							data-linkedin="${u.linkedin}"
+							data-tipo="${u.tipo}"
+							data-pontos="${pontosMap.get(u.id) ?: 0}"
+							data-medalhas="${#strings.listJoin(medalhasMap.get(u.id).![nome], ', ')}">
 							<td th:text="${u.id}"></td>
 							<td th:text="${u.nome}"></td>
-							<td th:text="${u.email}"></td>
 							<td th:text="${u.tipo}"></td>
-							<td th:text="${pontosMap.get(u.id) ?: 0}"></td>
-							<td><a th:href="@{'/usuario/formulario/' + ${u.id}}"
-								class="btn btn-sm btn-outline-primary">Editar</a>
-								<a th:href="@{'/participacao/pontos/' + ${u.id}}"
-								class="btn btn-sm btn-outline-success">Ver Pontos</a>
+							<td>
+								<button type="button" class="btn btn-sm btn-outline-info"
+									onclick="verDetalhesUsuario(this)">Ver Mais</button>
+								<a th:href="@{'/usuario/formulario/' + ${u.id}}"
+									class="btn btn-sm btn-outline-primary">Editar</a>
 								<a th:href="@{'/usuario/delete/' + ${u.id}}"
-								class="btn btn-sm btn-outline-danger"
-								onclick="return confirm('Excluir este usuário?')">Excluir</a></td>
+									class="btn btn-sm btn-outline-danger"
+									onclick="return confirm('Excluir este usuário?')">Excluir</a>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -51,6 +57,39 @@
 			<a th:href="@{/}" class="btn btn-secondary">Voltar ao início</a>
 		</div>
 	</div>
+
+<div class="modal fade" id="detalhesUsuarioModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="detalhesUsuarioTitulo"></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body" id="detalhesUsuarioBody"></div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function verDetalhesUsuario(btn) {
+	var row = btn.closest('tr');
+	document.getElementById('detalhesUsuarioTitulo').textContent = row.dataset.nome;
+	var html = '';
+	html += '<p><strong>Email:</strong> ' + (row.dataset.email || '—') + '</p>';
+	html += '<p><strong>CPF:</strong> ' + (row.dataset.cpf || '—') + '</p>';
+	html += '<p><strong>LinkedIn:</strong> ' + (row.dataset.linkedin ? '<a href="' + row.dataset.linkedin + '" target="_blank">' + row.dataset.linkedin + '</a>' : '—') + '</p>';
+	html += '<p><strong>Tipo:</strong> ' + row.dataset.tipo + '</p>';
+	html += '<hr>';
+	html += '<p><strong>Total Pontos:</strong> ' + row.dataset.pontos + '</p>';
+	html += '<p><strong>Medalhas:</strong> ' + (row.dataset.medalhas || '—') + '</p>';
+	document.getElementById('detalhesUsuarioBody').innerHTML = html;
+	var modal = new bootstrap.Modal(document.getElementById('detalhesUsuarioModal'));
+	modal.show();
+}
+</script>
 
 </body>
 </html>

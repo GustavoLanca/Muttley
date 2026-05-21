@@ -1,4 +1,4 @@
-	<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>Disciplina</title>
@@ -23,13 +23,24 @@
 					<input type="hidden" th:field="*{id}" />
 
 					<div class="mb-3">
-						<label class="form-label fw-semibold">Nome da Disciplina</label> <input
-							type="text" class="form-control" th:field="*{nome}"
+						<label class="form-label fw-semibold">Nome da Disciplina</label>
+						<input type="text" class="form-control" th:field="*{nome}"
 							id="nomeDisciplina"
 							placeholder="Ex: Engenharia de Software, Redes de Computadores"
 							maxlength="100" required>
 						<div class="invalid-feedback">Nome inválido. Use letras,
 							espaços, hífens e números romanos (mín. 3 caracteres).</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-semibold">Professor</label>
+						<select class="form-select" th:field="*{professor.id}">
+							<option value="">Selecione um professor</option>
+							<option th:each="p : ${professores}" th:value="${p.id}"
+								th:text="${p.nome}"></option>
+						</select>
+					</div>
+
 					<div class="d-flex justify-content-between">
 						<a th:href="@{/disciplina}" class="btn btn-secondary">Voltar</a>
 						<button type="submit" class="btn btn-primary">Salvar</button>

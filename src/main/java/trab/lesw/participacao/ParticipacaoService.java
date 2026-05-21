@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import trab.lesw.medalha.MedalhaService;
+import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
 import trab.lesw.evento.Evento;
 import trab.lesw.evento.EventoRepository;
@@ -21,16 +23,25 @@ public class ParticipacaoService {
 	@Autowired
 	private EventoRepository eventoRepository;
 
+	@Autowired
+	private MedalhaService medalhaService;
+
 	public String participar(Long usuarioId, Long eventoId) {
 		if (repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
 			return "Usuário já está inscrito nesse evento!";
 		}
 		Evento evento = eventoRepository.getReferenceById(eventoId);
+		Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
 		Participacao p = new Participacao();
-		p.setUsuario(usuarioRepository.getReferenceById(usuarioId));
+		p.setUsuario(usuario);
 		p.setEvento(evento);
-		p.setPontosObtidos(evento.getPontos());
+		p.setPontosGanhos(evento.getPontos());
 		repository.save(p);
+
+		medalhaService.awardMedal(usuario, evento);
+
+		Integer total = repository.sumPontosByUsuarioId(usuario.getId());
+		medalhaService.awardMedalByPoints(usuario, total != null ? total : 0);
 
 		return "Participação registrada!";
 	}

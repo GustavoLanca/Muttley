@@ -19,7 +19,6 @@
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
-                        <th>Eventos Vinculados</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -29,7 +28,6 @@
                         <td>
                             <span class="badge bg-primary fs-6" th:text="${t.nome}"></span>
                         </td>
-                        <td th:text="${t.eventos.size()}"></td>
                         <td>
                             <a th:href="@{'/tag/formulario/' + ${t.id}}"
                                class="btn btn-sm btn-outline-primary">Editar</a>

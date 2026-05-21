@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.transaction.Transactional;
+import trab.lesw.medalha.MedalhaService;
 import trab.lesw.participacao.ParticipacaoService;
 
 @Controller
@@ -23,6 +24,9 @@ public class UsuarioController {
     @Autowired
     private ParticipacaoService participacaoService;
 
+    @Autowired
+    private MedalhaService medalhaService;
+
     @GetMapping
     public String listar(Model model) {
         List<Usuario> usuarios = service.getAll();
@@ -31,8 +35,14 @@ public class UsuarioController {
                 Usuario::getId,
                 u -> participacaoService.calcularTotalPontos(u.getId())
             ));
+        Map<Long, List<trab.lesw.medalha.Medalha>> medalhasMap = usuarios.stream()
+            .collect(Collectors.toMap(
+                Usuario::getId,
+                u -> medalhaService.getMedalhasByUsuarioId(u.getId())
+            ));
         model.addAttribute("lista", usuarios);
         model.addAttribute("pontosMap", pontosMap);
+        model.addAttribute("medalhasMap", medalhasMap);
         return "usuario/listagem";
     }
 

@@ -5,7 +5,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import jakarta.transaction.Transactional;
+import trab.lesw.usuario.UsuarioRepository;
  
 @Controller
 @RequestMapping("/disciplina")
@@ -13,6 +15,9 @@ public class DisciplinaController {
  
     @Autowired
     private DisciplinaService service;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
  
     @GetMapping
     public String listar(Model model) {
@@ -23,12 +28,14 @@ public class DisciplinaController {
     @GetMapping("/formulario")
     public String novo(Model model) {
         model.addAttribute("disciplina", new Disciplina());
+        model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
         return "disciplina/formulario";
     }
  
     @GetMapping("/formulario/{id}")
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("disciplina", service.getById(id));
+        model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
         return "disciplina/formulario";
     }
  
