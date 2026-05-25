@@ -28,24 +28,12 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="e : ${lista}"
-							data-id="${e.id}"
-							data-titulo="${e.titulo}"
-							data-descricao="${e.descricao}"
-							data-tipo="${e.tipo}"
-							data-data="${#temporals.format(e.data, 'dd/MM/yyyy')}"
-							data-horario="${e.horaInicio} às ${e.horaFim}"
-							data-medalha="${e.medalhaNome}"
-							data-organizadores="${#strings.listJoin(e.organizadores.![nome], ', ')}"
-							data-palestrantes="${#strings.listJoin(e.palestrantes.![nome], ', ')}"
-							data-professores="${#strings.listJoin(e.professores.![nome], ', ')}">
+						<tr th:each="e : ${lista}">
 							<td th:text="${e.id}"></td>
 							<td th:text="${e.titulo}"></td>
 							<td th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}"></td>
 							<td th:text="${e.horaInicio}"></td>
 							<td>
-								<button type="button" class="btn btn-sm btn-outline-info"
-									onclick="verDetalhes(this)">Ver Mais</button>
 								<a th:href="@{'/evento/formulario/' + ${e.id}}"
 									class="btn btn-sm btn-outline-primary">Editar</a>
 								<a th:href="@{'/evento/delete/' + ${e.id}}"
@@ -62,65 +50,6 @@
 		</div>
 	</div>
 
-<div class="modal fade" id="detalhesModal" tabindex="-1">
-	<div class="modal-dialog modal-lg modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="detalhesTitulo"></h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body" id="detalhesBody">
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="qrModal" tabindex="-1">
-	<div class="modal-dialog modal-sm modal-dialog-centered">
-		<div class="modal-content text-center">
-			<div class="modal-header">
-				<h5 class="modal-title" id="qrModalTitle">QR Code</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<img id="qrImage" src="" alt="QR Code" class="img-fluid">
-				<p class="mt-2 text-muted small" id="qrModalSub">Aponte a câmera para participar</p>
-			</div>
-		</div>
-	</div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function verDetalhes(btn) {
-	var row = btn.closest('tr');
-	var titulo = row.dataset.titulo;
-	document.getElementById('detalhesTitulo').textContent = titulo;
-	var html = '';
-	html += '<p><strong>Descrição:</strong> ' + (row.dataset.descricao || '—') + '</p>';
-	html += '<p><strong>Tipo:</strong> ' + row.dataset.tipo + '</p>';
-	html += '<p><strong>Data:</strong> ' + row.dataset.data + '</p>';
-	html += '<p><strong>Horário:</strong> ' + (row.dataset.horario || '—') + '</p>';
-	html += '<p><strong>Medalha:</strong> ' + (row.dataset.medalha || '—') + '</p>';
-	html += '<p><strong>Organizadores:</strong> ' + (row.dataset.organizadores || '—') + '</p>';
-	html += '<p><strong>Palestrantes:</strong> ' + (row.dataset.palestrantes || '—') + '</p>';
-	html += '<p><strong>Professores:</strong> ' + (row.dataset.professores || '—') + '</p>';
-	html += '<button class="btn btn-sm btn-outline-dark mt-2" onclick="abrirQR(\'' + window.location.origin + '/evento/confirmar/' + row.dataset.id + '\', \'' + titulo.replace(/'/g, "\\'") + '\')">QR Code</button>';
-	document.getElementById('detalhesBody').innerHTML = html;
-	var modal = new bootstrap.Modal(document.getElementById('detalhesModal'));
-	modal.show();
-}
-
-function abrirQR(url, titulo) {
-	document.getElementById('qrModalTitle').textContent = titulo;
-	document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(url);
-	document.getElementById('qrModalSub').textContent = url;
-	var modal = new bootstrap.Modal(document.getElementById('qrModal'));
-	modal.show();
-}
-</script>
 </body>
 </html>

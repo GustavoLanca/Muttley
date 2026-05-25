@@ -53,8 +53,6 @@ public class Evento implements Serializable {
 
     private Integer pontos = 1;
 
-    private String medalhaNome;
-
     @ManyToMany
     @JoinTable(
         name = "evento_tag",

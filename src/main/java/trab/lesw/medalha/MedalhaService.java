@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import trab.lesw.evento.Evento;
+import trab.lesw.tag.Tag;
 import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
 
@@ -41,15 +42,17 @@ public class MedalhaService {
     }
 
     public void awardMedal(Usuario usuario, Evento evento) {
-        String nomeMedalha = evento.getMedalhaNome();
-        if (nomeMedalha == null || nomeMedalha.isBlank()) {
+        List<Tag> tags = evento.getTags();
+        if (tags == null || tags.isEmpty()) {
             return;
         }
-        Medalha medalha = new Medalha();
-        medalha.setNome(nomeMedalha);
-        medalha.setUsuario(usuario);
-        medalha.setEvento(evento);
-        repository.save(medalha);
+        for (Tag tag : tags) {
+            Medalha medalha = new Medalha();
+            medalha.setNome(tag.getNome());
+            medalha.setUsuario(usuario);
+            medalha.setEvento(evento);
+            repository.save(medalha);
+        }
     }
 
     public void awardMedalByPoints(Usuario usuario, int totalPontos) {

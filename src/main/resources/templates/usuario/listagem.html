@@ -28,20 +28,20 @@
 					</thead>
 					<tbody>
 						<tr th:each="u : ${lista}"
-							data-id="${u.id}"
-							data-nome="${u.nome}"
-							data-email="${u.email}"
-							data-cpf="${u.cpf}"
-							data-linkedin="${u.linkedin}"
-							data-tipo="${u.tipo}"
-							data-pontos="${pontosMap.get(u.id) ?: 0}"
-							data-medalhas="${#strings.listJoin(medalhasMap.get(u.id).![nome], ', ')}">
+							th:data-id="${u.id}"
+							th:data-nome="${u.nome}"
+							th:data-email="${u.email}"
+							th:data-cpf="${u.cpf}"
+							th:data-linkedin="${u.linkedin}"
+							th:data-tipo="${u.tipo}"
+							th:data-pontos="${pontosMap.get(u.id) ?: 0}"
+							th:data-medalhas="${#strings.listJoin(medalhasMap.get(u.id).![nome], ', ')}">
 							<td th:text="${u.id}"></td>
 							<td th:text="${u.nome}"></td>
 							<td th:text="${u.tipo}"></td>
 							<td>
-								<button type="button" class="btn btn-sm btn-outline-info"
-									onclick="verDetalhesUsuario(this)">Ver Mais</button>
+								<button type="button" class="btn btn-sm btn-outline-warning"
+									onclick="verDetalhesUsuario(this)">Medalhas</button>
 								<a th:href="@{'/usuario/formulario/' + ${u.id}}"
 									class="btn btn-sm btn-outline-primary">Editar</a>
 								<a th:href="@{'/usuario/delete/' + ${u.id}}"
@@ -73,16 +73,12 @@
 	</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function verDetalhesUsuario(btn) {
 	var row = btn.closest('tr');
-	document.getElementById('detalhesUsuarioTitulo').textContent = row.dataset.nome;
+	document.getElementById('detalhesUsuarioTitulo').textContent = 'Medalhas de ' + row.dataset.nome;
 	var html = '';
-	html += '<p><strong>Email:</strong> ' + (row.dataset.email || '—') + '</p>';
-	html += '<p><strong>CPF:</strong> ' + (row.dataset.cpf || '—') + '</p>';
-	html += '<p><strong>LinkedIn:</strong> ' + (row.dataset.linkedin ? '<a href="' + row.dataset.linkedin + '" target="_blank">' + row.dataset.linkedin + '</a>' : '—') + '</p>';
-	html += '<p><strong>Tipo:</strong> ' + row.dataset.tipo + '</p>';
-	html += '<hr>';
 	html += '<p><strong>Total Pontos:</strong> ' + row.dataset.pontos + '</p>';
 	html += '<p><strong>Medalhas:</strong> ' + (row.dataset.medalhas || '—') + '</p>';
 	document.getElementById('detalhesUsuarioBody').innerHTML = html;

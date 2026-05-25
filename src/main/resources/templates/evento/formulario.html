@@ -85,82 +85,83 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Nome da Medalha</label>
-                    <input type="text"
-                           class="form-control"
-                           th:field="*{medalhaNome}"
-                           id="medalhaNome"
-                           placeholder="Ex: Medalha de Ouro - Metodologia Ágil"
-                           maxlength="255">
-                    <div class="form-text">Deixe em branco se o evento não conceder medalha.</div>
-                </div>
-
-                <div class="mb-3">
                     <label class="form-label fw-semibold">Disciplina Relacionada</label>
-                    <select class="form-select" th:field="*{disciplina.id}" id="disciplinaEvento">
-                        <option value="">Nenhuma</option>
-                        <option th:each="d : ${disciplinas}"
-                                th:value="${d.id}"
-                                th:text="${d.nome}"></option>
-                    </select>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="busca-disciplina"
+                               placeholder="Buscar disciplina..."
+                               autocomplete="off"
+                               oninput="buscarDisciplina(this)"
+                               onfocus="buscarDisciplina(this)">
+                        <div id="resultados-disciplina" class="list-group position-absolute w-100 shadow-sm"
+                             style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto; border-radius: 0 0 4px 4px;">
+                        </div>
+                    </div>
+                    <div id="selecionados-disciplina" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    <div id="hidden-disciplina"></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Organizadores</label>
-                    <input type="text" class="form-control mb-1 busca-participante"
-                           placeholder="Buscar organizador..."
-                           oninput="filtrarParticipante(this, 'select-organizadores')">
-                    <select class="form-select select-organizadores" name="organizadores" multiple size="4">
-                        <option th:each="o : ${organizadores}" th:value="${o.id}"
-                            th:text="${o.nome}"
-                            th:selected="${evento.organizadores != null and evento.organizadores.contains(o)}"></option>
-                    </select>
-                    <div class="form-text">Segure Ctrl para selecionar vários.</div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="busca-organizadores"
+                               placeholder="Buscar organizador..."
+                               autocomplete="off"
+                               oninput="buscarParticipante(this, 'organizadores')"
+                               onfocus="buscarParticipante(this, 'organizadores')">
+                        <div id="resultados-organizadores" class="list-group position-absolute w-100 shadow-sm"
+                             style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto; border-radius: 0 0 4px 4px;">
+                        </div>
+                    </div>
+                    <div id="selecionados-organizadores" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    <div id="hidden-organizadores"></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Palestrantes</label>
-                    <input type="text" class="form-control mb-1 busca-participante"
-                           placeholder="Buscar palestrante..."
-                           oninput="filtrarParticipante(this, 'select-palestrantes')">
-                    <select class="form-select select-palestrantes" name="palestrantes" multiple size="4">
-                        <option th:each="p : ${palestrantes}" th:value="${p.id}"
-                            th:text="${p.nome}"
-                            th:selected="${evento.palestrantes != null and evento.palestrantes.contains(p)}"></option>
-                    </select>
-                    <div class="form-text">Segure Ctrl para selecionar vários.</div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="busca-palestrantes"
+                               placeholder="Buscar palestrante..."
+                               autocomplete="off"
+                               oninput="buscarParticipante(this, 'palestrantes')"
+                               onfocus="buscarParticipante(this, 'palestrantes')">
+                        <div id="resultados-palestrantes" class="list-group position-absolute w-100 shadow-sm"
+                             style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto; border-radius: 0 0 4px 4px;">
+                        </div>
+                    </div>
+                    <div id="selecionados-palestrantes" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    <div id="hidden-palestrantes"></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Professores</label>
-                    <input type="text" class="form-control mb-1 busca-participante"
-                           placeholder="Buscar professor..."
-                           oninput="filtrarParticipante(this, 'select-professores')">
-                    <select class="form-select select-professores" name="professores" multiple size="4">
-                        <option th:each="p : ${professores}" th:value="${p.id}"
-                            th:text="${p.nome}"
-                            th:selected="${evento.professores != null and evento.professores.contains(p)}"></option>
-                    </select>
-                    <div class="form-text">Segure Ctrl para selecionar vários.</div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="busca-professores"
+                               placeholder="Buscar professor..."
+                               autocomplete="off"
+                               oninput="buscarParticipante(this, 'professores')"
+                               onfocus="buscarParticipante(this, 'professores')">
+                        <div id="resultados-professores" class="list-group position-absolute w-100 shadow-sm"
+                             style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto; border-radius: 0 0 4px 4px;">
+                        </div>
+                    </div>
+                    <div id="selecionados-professores" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    <div id="hidden-professores"></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Tags / Competências</label>
-                    <input type="text" class="form-control mb-2" id="buscaTag"
-                           placeholder="Buscar tag..." oninput="filtrarTags()">
-                    <div class="border rounded p-3 bg-white" id="containerTags">
-                        <div th:each="t : ${tags}" class="form-check form-check-inline tag-item">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   name="tags"
-                                   th:value="${t.id}"
-                                   th:id="${'tag-' + t.id}"
-                                   th:checked="${evento.tags != null && evento.tags.contains(t)}">
-                            <label class="form-check-label"
-                                   th:for="${'tag-' + t.id}"
-                                   th:text="${t.nome}"></label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="busca-tags"
+                               placeholder="Buscar tag..."
+                               autocomplete="off"
+                               oninput="buscarTag(this)"
+                               onfocus="buscarTag(this)">
+                        <div id="resultados-tags" class="list-group position-absolute w-100 shadow-sm"
+                             style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto; border-radius: 0 0 4px 4px;">
                         </div>
                     </div>
+                    <div id="selecionados-tags" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    <div id="hidden-tags"></div>
                 </div>
 
                 <div class="d-flex justify-content-between">
@@ -172,31 +173,274 @@
         </div>
     </div>
 </div>
+<script th:inline="javascript">
+/*<![CDATA[*/
+var dadosUsuarios = {
+    organizadores: [
+        /*[# th:each="u : ${organizadores}"]*/
+        {id: /*[[${u.id}]]*/, nome: /*[[${u.nome}]]*/}/*[# th:if="${!uStat.last}"]*/,/*[/]*/
+        /*[/]*/
+    ],
+    palestrantes: [
+        /*[# th:each="u : ${palestrantes}"]*/
+        {id: /*[[${u.id}]]*/, nome: /*[[${u.nome}]]*/}/*[# th:if="${!uStat.last}"]*/,/*[/]*/
+        /*[/]*/
+    ],
+    professores: [
+        /*[# th:each="u : ${professores}"]*/
+        {id: /*[[${u.id}]]*/, nome: /*[[${u.nome}]]*/}/*[# th:if="${!uStat.last}"]*/,/*[/]*/
+        /*[/]*/
+    ]
+};
+var dadosDisciplinas = [
+    /*[# th:each="d : ${disciplinas}"]*/
+    {id: /*[[${d.id}]]*/, nome: /*[[${d.nome}]]*/}/*[# th:if="${!dStat.last}"]*/,/*[/]*/
+    /*[/]*/
+];
+/*[# th:if="${evento.disciplina != null}"]*/
+var selecionadoDisciplina = {id: /*[[${evento.disciplina.id}]]*/, nome: /*[[${evento.disciplina.nome}]]*/};
+/*[/]*/
+/*[# th:if="${evento.disciplina == null}"]*/
+var selecionadoDisciplina = null;
+/*[/]*/
+var dadosTags = [
+    /*[# th:each="t : ${tags}"]*/
+    {id: /*[[${t.id}]]*/, nome: /*[[${t.nome}]]*/}/*[# th:if="${!tStat.last}"]*/,/*[/]*/
+    /*[/]*/
+];
+var selecionadosTags = [
+    /*[# th:each="t : ${evento.tags}"]*/
+    {id: /*[[${t.id}]]*/, nome: /*[[${t.nome}]]*/}/*[# th:if="${!tStat.last}"]*/,/*[/]*/
+    /*[/]*/
+];
+var selecionados = {
+    organizadores: [
+        /*[# th:each="u : ${evento.organizadores}"]*/
+        {id: /*[[${u.id}]]*/, nome: /*[[${u.nome}]]*/}/*[# th:if="${!uStat.last}"]*/,/*[/]*/
+        /*[/]*/
+    ],
+    palestrantes: [
+        /*[# th:each="u : ${evento.palestrantes}"]*/
+        {id: /*[[${u.id}]]*/, nome: /*[[${u.nome}]]*/}/*[# th:if="${!uStat.last}"]*/,/*[/]*/
+        /*[/]*/
+    ],
+    professores: [
+        /*[# th:each="u : ${evento.professores}"]*/
+        {id: /*[[${u.id}]]*/, nome: /*[[${u.nome}]]*/}/*[# th:if="${!uStat.last}"]*/,/*[/]*/
+        /*[/]*/
+    ]
+};
+/*]]>*/
+</script>
 <script>
-function filtrarTags() {
-    var busca = document.getElementById('buscaTag').value.toLowerCase();
-    var itens = document.querySelectorAll('#containerTags .tag-item');
-    itens.forEach(function(item) {
-        var label = item.querySelector('label');
-        if (label && label.textContent.toLowerCase().includes(busca)) {
-            item.style.display = 'inline-block';
-        } else {
-            item.style.display = 'none';
-        }
+function buscarTag(input) {
+    var busca = input.value.trim().toLowerCase();
+    var resultados = document.getElementById('resultados-tags');
+    resultados.innerHTML = '';
+    var disponiveis = dadosTags.filter(function(t) {
+        return !estaTagSelecionada(t.id);
+    }).sort(function(a, b) { return a.nome.localeCompare(b.nome); });
+    if (busca !== '') {
+        disponiveis = disponiveis.filter(function(t) {
+            return t.nome.toLowerCase().includes(busca);
+        });
+    }
+    if (disponiveis.length === 0) { resultados.style.display = 'none'; return; }
+    disponiveis.forEach(function(t) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2';
+        btn.innerHTML = t.nome + ' <span class="badge bg-primary rounded-pill">+ Adicionar</span>';
+        btn.onclick = function() { adicionarTag(t); };
+        resultados.appendChild(btn);
+    });
+    resultados.style.display = 'block';
+}
+function estaTagSelecionada(id) {
+    return selecionadosTags.some(function(t) { return t.id === id; });
+}
+function adicionarTag(tag) {
+    selecionadosTags.push(tag);
+    atualizarTagsSelecionadas();
+    var input = document.getElementById('busca-tags');
+    input.value = '';
+    input.focus();
+    document.getElementById('resultados-tags').style.display = 'none';
+}
+function removerTag(id) {
+    selecionadosTags = selecionadosTags.filter(function(t) { return t.id !== id; });
+    atualizarTagsSelecionadas();
+}
+function atualizarTagsSelecionadas() {
+    var container = document.getElementById('selecionados-tags');
+    var hiddenContainer = document.getElementById('hidden-tags');
+    container.innerHTML = '';
+    hiddenContainer.innerHTML = '';
+    selecionadosTags.forEach(function(t) {
+        var tag = document.createElement('span');
+        tag.className = 'badge bg-secondary d-inline-flex align-items-center gap-1 ps-3 pe-1 py-2';
+        tag.style.fontSize = '0.85rem';
+        var text = document.createTextNode(t.nome);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close btn-close-white ms-1';
+        closeBtn.style.fontSize = '0.5rem';
+        closeBtn.onclick = function() { removerTag(t.id); };
+        closeBtn.setAttribute('aria-label', 'Remover');
+        tag.appendChild(text);
+        tag.appendChild(closeBtn);
+        container.appendChild(tag);
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'tags';
+        hidden.value = t.id;
+        hiddenContainer.appendChild(hidden);
     });
 }
-function filtrarParticipante(input, selectClass) {
-    var busca = input.value.toLowerCase();
-    var select = document.querySelector('.' + selectClass);
-    var options = select.querySelectorAll('option');
-    options.forEach(function(opt) {
-        if (opt.textContent.toLowerCase().includes(busca)) {
-            opt.style.display = 'block';
-        } else {
-            opt.style.display = 'none';
-        }
+function buscarParticipante(input, tipo) {
+    var busca = input.value.trim().toLowerCase();
+    var resultados = document.getElementById('resultados-' + tipo);
+    resultados.innerHTML = '';
+    var disponiveis = (dadosUsuarios[tipo] || []).filter(function(u) {
+        return !estaSelecionado(u.id, tipo);
+    }).sort(function(a, b) { return a.nome.localeCompare(b.nome); });
+    if (busca !== '') {
+        disponiveis = disponiveis.filter(function(u) {
+            return u.nome.toLowerCase().includes(busca);
+        });
+    }
+    if (disponiveis.length === 0) { resultados.style.display = 'none'; return; }
+    disponiveis.forEach(function(u) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2';
+        btn.innerHTML = u.nome + ' <span class="badge bg-primary rounded-pill">+ Adicionar</span>';
+        btn.onclick = function() { adicionarParticipante(u, tipo); };
+        resultados.appendChild(btn);
+    });
+    resultados.style.display = 'block';
+}
+function estaSelecionado(id, tipo) {
+    return (selecionados[tipo] || []).some(function(u) { return u.id === id; });
+}
+function adicionarParticipante(usuario, tipo) {
+    if (!selecionados[tipo]) selecionados[tipo] = [];
+    selecionados[tipo].push(usuario);
+    atualizarTags(tipo);
+    var input = document.getElementById('busca-' + tipo);
+    input.value = '';
+    input.focus();
+    document.getElementById('resultados-' + tipo).style.display = 'none';
+}
+function removerParticipante(id, tipo) {
+    if (!selecionados[tipo]) return;
+    selecionados[tipo] = selecionados[tipo].filter(function(u) { return u.id !== id; });
+    atualizarTags(tipo);
+}
+function atualizarTags(tipo) {
+    var container = document.getElementById('selecionados-' + tipo);
+    var hiddenContainer = document.getElementById('hidden-' + tipo);
+    container.innerHTML = '';
+    hiddenContainer.innerHTML = '';
+    (selecionados[tipo] || []).forEach(function(u) {
+        var tag = document.createElement('span');
+        tag.className = 'badge bg-secondary d-inline-flex align-items-center gap-1 ps-3 pe-1 py-2';
+        tag.style.fontSize = '0.85rem';
+        var text = document.createTextNode(u.nome);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close btn-close-white ms-1';
+        closeBtn.style.fontSize = '0.5rem';
+        closeBtn.onclick = function() { removerParticipante(u.id, tipo); };
+        closeBtn.setAttribute('aria-label', 'Remover');
+        tag.appendChild(text);
+        tag.appendChild(closeBtn);
+        container.appendChild(tag);
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = tipo;
+        hidden.value = u.id;
+        hiddenContainer.appendChild(hidden);
     });
 }
+function buscarDisciplina(input) {
+    var busca = input.value.trim().toLowerCase();
+    var resultados = document.getElementById('resultados-disciplina');
+    resultados.innerHTML = '';
+    var disponiveis = dadosDisciplinas.slice().sort(function(a, b) { return a.nome.localeCompare(b.nome); });
+    if (busca !== '') {
+        disponiveis = disponiveis.filter(function(d) {
+            return d.nome.toLowerCase().includes(busca);
+        });
+    }
+    if (disponiveis.length === 0) { resultados.style.display = 'none'; return; }
+    disponiveis.forEach(function(d) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2';
+        btn.innerHTML = d.nome + ' <span class="badge bg-primary rounded-pill">+ Adicionar</span>';
+        btn.onclick = function() { adicionarDisciplina(d); };
+        resultados.appendChild(btn);
+    });
+    resultados.style.display = 'block';
+}
+function adicionarDisciplina(disciplina) {
+    if (selecionadoDisciplina && selecionadoDisciplina.id === disciplina.id) return;
+    selecionadoDisciplina = disciplina;
+    atualizarTagDisciplina();
+    var input = document.getElementById('busca-disciplina');
+    input.value = '';
+    input.focus();
+    document.getElementById('resultados-disciplina').style.display = 'none';
+}
+function removerDisciplina() {
+    selecionadoDisciplina = null;
+    atualizarTagDisciplina();
+}
+function atualizarTagDisciplina() {
+    var container = document.getElementById('selecionados-disciplina');
+    var hiddenContainer = document.getElementById('hidden-disciplina');
+    container.innerHTML = '';
+    hiddenContainer.innerHTML = '';
+    if (selecionadoDisciplina) {
+        var tag = document.createElement('span');
+        tag.className = 'badge bg-secondary d-inline-flex align-items-center gap-1 ps-3 pe-1 py-2';
+        tag.style.fontSize = '0.85rem';
+        var text = document.createTextNode(selecionadoDisciplina.nome);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close btn-close-white ms-1';
+        closeBtn.style.fontSize = '0.5rem';
+        closeBtn.onclick = removerDisciplina;
+        closeBtn.setAttribute('aria-label', 'Remover');
+        tag.appendChild(text);
+        tag.appendChild(closeBtn);
+        container.appendChild(tag);
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'disciplina.id';
+        hidden.value = selecionadoDisciplina.id;
+        hiddenContainer.appendChild(hidden);
+    }
+}
+document.addEventListener('click', function(e) {
+    ['organizadores', 'palestrantes', 'professores', 'disciplina', 'tags'].forEach(function(tipo) {
+        var input = document.getElementById('busca-' + tipo);
+        var resultados = document.getElementById('resultados-' + tipo);
+        if (input && resultados && resultados.style.display !== 'none') {
+            if (!input.contains(e.target) && !resultados.contains(e.target)) {
+                resultados.style.display = 'none';
+            }
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    ['organizadores', 'palestrantes', 'professores'].forEach(function(tipo) {
+        atualizarTags(tipo);
+    });
+    atualizarTagDisciplina();
+    atualizarTagsSelecionadas();
+});
 </script>
 </body>
 </html>
