@@ -1,0 +1,95 @@
+package trab.lesw.evento;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import org.springframework.stereotype.Service;
+
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
+
+import trab.lesw.usuario.Usuario;
+
+@Service
+public class CertificadoService {
+
+    public byte[] gerarCertificado(Usuario usuario, Evento evento) {
+        try {
+            InputStream template = getClass().getClassLoader().getResourceAsStream("templates/certificado.pdf");
+            if (template == null) {
+                return gerarCertificadoSimples(usuario, evento);
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PdfReader reader = new PdfReader(template);
+            PdfStamper stamper = new PdfStamper(reader, out);
+
+            AcroFields form = stamper.getAcroFields();
+
+            String nome = usuario.getNome() != null ? usuario.getNome() : "Aluno";
+            String tituloEvento = evento.getTitulo() != null ? evento.getTitulo() : "Evento";
+            String dataEvento = evento.getData() != null
+                    ? evento.getData().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    : "";
+
+            String duracao = "";
+            if (evento.getHoraInicio() != null && evento.getHoraFim() != null) {
+                long minutos = Duration.between(evento.getHoraInicio(), evento.getHoraFim()).toMinutes();
+                long horas = minutos / 60;
+                long minRestantes = minutos % 60;
+                if (horas > 0 && minRestantes > 0) {
+                    duracao = horas + "h" + minRestantes + "min";
+                } else if (horas > 0) {
+                    duracao = horas + "h";
+                } else {
+                    duracao = minRestantes + "min";
+                }
+            }
+
+            String dataEmissao = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            form.setField("usuarioNome", nome);
+            form.setField("eventoTitulo", tituloEvento);
+            form.setField("eventoData", dataEvento);
+            form.setField("eventoCargaHoraria", duracao);
+            form.setField("dataAtual", dataEmissao);
+
+            stamper.setFormFlattening(true);
+            stamper.close();
+            reader.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            return gerarCertificadoSimples(usuario, evento);
+        }
+    }
+
+    private byte[] gerarCertificadoSimples(Usuario usuario, Evento evento) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            com.lowagie.text.Document doc = new com.lowagie.text.Document();
+            com.lowagie.text.pdf.PdfWriter.getInstance(doc, out);
+            doc.open();
+
+            String nome = usuario.getNome() != null ? usuario.getNome() : "Aluno";
+            String tituloEvento = evento.getTitulo() != null ? evento.getTitulo() : "Evento";
+
+            com.lowagie.text.Paragraph p = new com.lowagie.text.Paragraph(
+                "CERTIFICADO DE PARTICIPAÇÃO\n\n" +
+                nome + "\n\n" +
+                "participou do evento " + tituloEvento + "\n\n" +
+                "Emitido em: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                FontFactory.getFont(FontFactory.HELVETICA, 14));
+            p.setAlignment(com.lowagie.text.Element.ALIGN_CENTER);
+            doc.add(p);
+            doc.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            return new byte[0];
+        }
+    }
+}

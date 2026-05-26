@@ -3,6 +3,7 @@ package trab.lesw.usuario;
 import java.io.Serializable;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,6 +41,13 @@ public class Usuario implements Serializable {
     private String senha;
     
     private String linkedin;
+
+    @Column(length = 2048)
+    private String linkedinToken;
+
+    private Long linkedinTokenExpires;
+
+    private String linkedinPersonId;
 
     private String cpf;
     

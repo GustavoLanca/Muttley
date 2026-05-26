@@ -16,4 +16,7 @@ public interface ParticipacaoRepository extends JpaRepository<Participacao, Long
     @Query("SELECT COALESCE(SUM(p.pontosGanhos), 0) FROM Participacao p WHERE p.usuario.id = :usuarioId")
     Integer sumPontosByUsuarioId(Long usuarioId);
     List<Participacao> findByUsuarioId(Long usuarioId);
+     //adicionado para separar os eventos
+    @Query("SELECT p FROM Participacao p JOIN FETCH p.usuario WHERE p.evento.id = :eventoId")
+    List<Participacao> findByEventoIdWithUsuario(Long eventoId);
 }

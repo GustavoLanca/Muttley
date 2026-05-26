@@ -11,4 +11,5 @@ import org.springframework.transaction.annotation.Transactional;
 public interface MedalhaRepository extends JpaRepository<Medalha, Long> {
     List<Medalha> findByUsuarioId(Long usuarioId);
     long countByUsuarioIdAndNome(Long usuarioId, String nome);
+    List<Medalha> findByEventoId(Long eventoId);
 }

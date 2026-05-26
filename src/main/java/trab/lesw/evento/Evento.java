@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -52,6 +53,13 @@ public class Evento implements Serializable {
     private LocalTime horaFim;
 
     private Integer pontos = 1;
+
+    private String imagemUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String mensagemPublicacao;
+
+    private Boolean publicado = false;
 
     @ManyToMany
     @JoinTable(

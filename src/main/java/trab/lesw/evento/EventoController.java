@@ -1,23 +1,30 @@
 package trab.lesw.evento;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import trab.lesw.disciplina.DisciplinaRepository;
+import trab.lesw.linkedin.LinkedInService;
 import trab.lesw.participacao.ParticipacaoService;
 import trab.lesw.tag.TagRepository;
 import trab.lesw.usuario.Usuario;
@@ -26,6 +33,8 @@ import trab.lesw.usuario.UsuarioRepository;
 @Controller
 @RequestMapping("/evento")
 public class EventoController {
+
+	private static final Logger log = LoggerFactory.getLogger(EventoController.class);
 
 	@Autowired
 	private EventoService service;
@@ -43,7 +52,10 @@ public class EventoController {
 	private ParticipacaoService participacaoService;
 
 	@Autowired
-	private ResourceLoader resourceLoader;
+	private LinkedInService linkedInService;
+
+	@Autowired
+	private CertificadoService certificadoService;
 
 	@GetMapping
 	public String listar(Model model, HttpServletRequest request) {
@@ -69,7 +81,21 @@ public class EventoController {
 						 @RequestParam(required = false) List<Long> organizadores,
 						 @RequestParam(required = false) List<Long> palestrantes,
 						 @RequestParam(required = false) List<Long> professores,
+						 @RequestParam(required = false) MultipartFile imagemFile,
 						 RedirectAttributes attr) {
+		if (imagemFile != null && !imagemFile.isEmpty()) {
+			try {
+				String projectDir = System.getProperty("user.dir");
+				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "eventos");
+				Files.createDirectories(uploadPath);
+				String nomeArquivo = System.currentTimeMillis() + "_" + imagemFile.getOriginalFilename();
+				Path destino = uploadPath.resolve(nomeArquivo);
+				Files.copy(imagemFile.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+				evento.setImagemUrl("/uploads/eventos/" + nomeArquivo);
+			} catch (Exception e) {
+				attr.addFlashAttribute("message", "Erro ao salvar imagem: " + e.getMessage());
+			}
+		}
 		attr.addFlashAttribute("message", service.save(evento, tags, organizadores, palestrantes, professores));
 		return "redirect:/evento";
 	}
@@ -102,45 +128,59 @@ public class EventoController {
 	public String confirmar(@PathVariable Long id,
 							@RequestParam String email,
 							@RequestParam String senha,
-							Model model) {
+							RedirectAttributes attr) {
 		Evento evento = service.getById(id);
-		model.addAttribute("evento", evento);
 
 		Optional<Usuario> opt = usuarioRepository.findByEmailAndSenha(email, senha);
 		if (opt.isEmpty()) {
-			model.addAttribute("erro", "E-mail ou senha inválidos.");
-			return "evento/confirmar";
+			attr.addFlashAttribute("erro", "E-mail ou senha inválidos.");
+			return "redirect:/evento/confirmar/" + id;
 		}
 
 		Usuario usuario = opt.get();
 		if (!usuario.getTipo().equals("ALUNO") && !usuario.getTipo().equals("EXTERNO")) {
-			model.addAttribute("erro", "Apenas alunos e externos podem confirmar participação.");
-			return "evento/confirmar";
+			attr.addFlashAttribute("erro", "Apenas alunos e externos podem confirmar participação.");
+			return "redirect:/evento/confirmar/" + id;
 		}
 
 		String msg = participacaoService.participar(usuario.getId(), id);
 		if (msg.equals("Usuário já está inscrito nesse evento!")) {
-			model.addAttribute("erro", msg);
-			return "evento/confirmar";
+			attr.addFlashAttribute("erro", msg);
+			return "redirect:/evento/confirmar/" + id;
 		}
 
-		return "redirect:/evento/confirmado/" + id;
+		String linkedinMsg = linkedInService.publishEvent(usuario, evento);
+		attr.addFlashAttribute("linkedinMsg", linkedinMsg);
+
+		return "redirect:/evento/confirmado/" + id + "/" + usuario.getId();
 	}
 
-	@GetMapping("/confirmado/{id}")
-	public String confirmado(@PathVariable Long id, Model model) {
+	@GetMapping("/confirmado/{id}/{usuarioId}")
+	public String confirmado(@PathVariable Long id, @PathVariable Long usuarioId, Model model) {
 		model.addAttribute("evento", service.getById(id));
-		model.addAttribute("downloadUrl", "/evento/certificado/" + id);
+		model.addAttribute("usuario", usuarioRepository.findById(usuarioId).orElse(null));
+		model.addAttribute("downloadUrl", "/evento/certificado/" + id + "/" + usuarioId);
 		return "evento/confirmado";
 	}
 
-	@GetMapping("/certificado/{eventoId}")
-	public ResponseEntity<InputStreamResource> certificado(@PathVariable Long eventoId) {
+	@GetMapping("/certificado/{eventoId}/{usuarioId}")
+	public ResponseEntity<InputStreamResource> certificado(@PathVariable Long eventoId, @PathVariable Long usuarioId) {
 		try {
-			InputStream in = getClass().getClassLoader().getResourceAsStream("templates/certificado.pdf");
-			if (in == null) {
+			Optional<Usuario> optUsuario = usuarioRepository.findById(usuarioId);
+			if (optUsuario.isEmpty()) {
 				return ResponseEntity.notFound().build();
 			}
+			Evento evento = service.getById(eventoId);
+			if (evento == null) {
+				return ResponseEntity.notFound().build();
+			}
+
+			byte[] pdfBytes = certificadoService.gerarCertificado(optUsuario.get(), evento);
+			if (pdfBytes.length == 0) {
+				return ResponseEntity.internalServerError().build();
+			}
+
+			ByteArrayInputStream in = new ByteArrayInputStream(pdfBytes);
 			InputStreamResource resource = new InputStreamResource(in);
 			return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=certificado.pdf")

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import trab.lesw.disciplina.Disciplina;
 import trab.lesw.disciplina.DisciplinaRepository;
+import trab.lesw.medalha.MedalhaRepository;
+import trab.lesw.participacao.ParticipacaoRepository;
 import trab.lesw.tag.Tag;
 import trab.lesw.tag.TagRepository;
 import trab.lesw.usuario.Usuario;
@@ -28,6 +30,12 @@ public class EventoService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ParticipacaoRepository participacaoRepository;
+
+    @Autowired
+    private MedalhaRepository medalhaRepository;
 
     public List<Evento> getAll() {
         return eventoRepository.findAll(Sort.by("data").descending());
@@ -71,6 +79,8 @@ public class EventoService {
     }
 
     public String delete(Long id) {
+        medalhaRepository.findByEventoId(id).forEach(m -> medalhaRepository.delete(m));
+        participacaoRepository.findByEventoIdWithUsuario(id).forEach(p -> participacaoRepository.delete(p));
     	eventoRepository.deleteById(id);
         return "Evento deletado!";
     }
