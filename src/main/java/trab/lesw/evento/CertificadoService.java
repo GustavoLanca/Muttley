@@ -31,6 +31,36 @@ public class CertificadoService {
 
             AcroFields form = stamper.getAcroFields();
 
+//Carregar fonte
+            BaseFont calibriBold = null;
+            BaseFont calibriRegular = null;
+            try (InputStream boldStream = getClass().getClassLoader().getResourceAsStream("fonts/calibrib.ttf");
+                 InputStream regularStream = getClass().getClassLoader().getResourceAsStream("fonts/calibri.ttf")) {
+    
+                if (boldStream != null) {
+                    byte[] boldBytes = boldStream.readAllBytes();
+                    calibriBold = BaseFont.createFont("calibrib.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED, BaseFont.CACHED, boldBytes, null);
+                }
+                if (regularStream != null) {
+                    byte[] regularBytes = regularStream.readAllBytes();
+                    calibriRegular = BaseFont.createFont("calibri.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED, BaseFont.CACHED, regularBytes, null);
+                }
+            } catch (Exception e) {
+//Esta dentro de um try catch para caso nao encontre a fonte nao quebre o programa
+            }
+            if (calibriBold != null) {
+                form.setFieldProperty("usuarioNome", "textfont", calibriBold, null);
+                form.setFieldProperty("usuarioNome", "textsize", 20.2f, null);
+                form.setFieldProperty("eventoTitulo", "textfont", calibriBold, null);
+                form.setFieldProperty("eventoTitulo", "textsize", 16.5f, null);
+            }
+            if (calibriRegular != null) {
+                form.setFieldProperty("eventoData", "textfont", calibriRegular, null);
+                form.setFieldProperty("eventoData", "textsize", 16.5f, null);
+            }
+
+            
+            
             String nome = usuario.getNome() != null ? usuario.getNome() : "Aluno";
             String tituloEvento = evento.getTitulo() != null ? evento.getTitulo() : "Evento";
             String dataEvento = evento.getData() != null
