@@ -36,7 +36,7 @@ public class UsuarioService {
     }
 
     public Usuario getById(Long id) {
-        return repository.getReferenceById(id);
+        return repository.findById(id).orElse(null);
     }
 
     public String save(Usuario usuario) {
