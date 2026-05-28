@@ -41,6 +41,12 @@ public class UsuarioService {
 
     public String save(Usuario usuario) {
     	boolean isNovo = usuario.getId() == null;
+    	if (!isNovo && (usuario.getSenha() == null || usuario.getSenha().isBlank())) {
+    	    Usuario existente = repository.findById(usuario.getId()).orElse(null);
+    	    if (existente != null) {
+    	        usuario.setSenha(existente.getSenha());
+    	    }
+    	}
     	repository.save(usuario);
     	return isNovo ? "Usuário criado com sucesso!" : "Usuário atualizado com sucesso!";
     }
