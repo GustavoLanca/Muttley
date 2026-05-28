@@ -44,11 +44,15 @@ public class CertificadoService {
             }
             if (calibriRegular != null) {
                 form.setFieldProperty("usuarioNome", "textfont", calibriRegular, null);
-                form.setFieldProperty("usuarioNome", "textsize", 20.2f, null);
+                form.setFieldProperty("usuarioNome", "textsize", 16.5f, null);
                 form.setFieldProperty("eventoTitulo", "textfont", calibriRegular, null);
                 form.setFieldProperty("eventoTitulo", "textsize", 16.5f, null);
                 form.setFieldProperty("eventoData", "textfont", calibriRegular, null);
                 form.setFieldProperty("eventoData", "textsize", 16.5f, null);
+                form.setFieldProperty("eventoCargaHoraria", "textfont", calibriRegular, null);
+                form.setFieldProperty("eventoCargaHoraria", "textsize", 17.5f, null);
+                form.setFieldProperty("dataAtual", "textfont", calibriRegular, null);
+                form.setFieldProperty("dataAtual", "textsize", 17.5f, null);
             }
 
             
@@ -65,7 +69,7 @@ public class CertificadoService {
                 long horas = minutos / 60;
                 long minRestantes = minutos % 60;
                 if (horas > 0 && minRestantes > 0) {
-                    duracao = horas + " horas. " + minRestantes + "min";
+                    duracao = horas + " horas " + minRestantes + "min.";
                 } else if (horas > 0) {
                     duracao = horas + " horas.";
                 } else {

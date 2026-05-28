@@ -217,6 +217,29 @@ public class EventoController {
 			return "redirect:/evento/confirmar/" + id;
 		}
 
+		if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuario.getId(), id)) {
+			try {
+				byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
+				if (pdfBytes.length > 0) {
+					String projectDir = System.getProperty("user.dir");
+					Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
+					Files.createDirectories(uploadPath);
+					String nomeArquivo = usuario.getId() + "_" + id + ".pdf";
+					Path destino = uploadPath.resolve(nomeArquivo);
+					Files.write(destino, pdfBytes);
+
+					Certificado cert = new Certificado();
+					cert.setUsuario(usuario);
+					cert.setEvento(evento);
+					cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
+					cert.setDataEmissao(LocalDateTime.now());
+					certificadoRepository.save(cert);
+				}
+			} catch (Exception e) {
+				log.error("Erro ao gerar certificado automático", e);
+			}
+		}
+
 		return "redirect:/linkedin/auth?usuarioId=" + usuario.getId() + "&eventoId=" + id;
 	}
 

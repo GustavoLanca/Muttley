@@ -698,9 +698,25 @@ textarea.form-control-custom {
   color: var(--gray-700);
 }
 
-.modal-box-body,
+.modal-box-body {
+  padding: 24px;
+}
+
 .qr-modal-body {
   padding: 24px;
+  text-align: center;
+}
+
+.qr-modal-body img {
+  display: block;
+  margin: 0 auto 16px;
+  max-width: 100%;
+}
+
+.qr-modal-body p {
+  word-break: break-all;
+  font-size: 0.875rem;
+  color: var(--gray-600);
 }
 
 .modal-box-footer,
