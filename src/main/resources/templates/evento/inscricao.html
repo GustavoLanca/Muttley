@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inscrição no Evento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/muttley.css}">
+</head>
+<body>
+
+<nav class="navbar-muttley">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-brand">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 2L2 12v8l14 10 14-10v-8L16 2z"/>
+        <path d="M8 16l4 4 8-8"/>
+      </svg>
+      Muttley
+    </a>
+    <div class="navbar-links">
+      <a th:href="@{/}">Início</a>
+      <a th:href="@{/evento}" class="active">Eventos</a>
+      <a th:href="@{/usuario}">Usuários</a>
+      <a th:href="@{/disciplina}">Disciplinas</a>
+      <a th:href="@{/tag}">Tags</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container-page" style="max-width:520px;">
+    <div class="page-header">
+      <h1 class="page-title" th:text="${evento.titulo}"></h1>
+    </div>
+
+    <div th:if="${message}" class="alert-custom alert-custom-info" th:text="${message}"></div>
+    <div th:if="${erro}" class="alert-custom alert-custom-danger" th:text="${erro}"></div>
+    <div th:if="${sucesso}" class="alert-custom alert-custom-success" th:text="${sucesso}"></div>
+
+    <div class="card-custom">
+      <div class="card-custom-body">
+        <form th:if="${sucesso == null}" th:action="@{'/evento/inscricao/' + ${evento.id}}" method="post">
+          <div class="form-custom">
+            <p style="text-align:center;color:var(--gray-500);font-size:.875rem;margin:0;">
+              Inscreva-se no evento informando seus dados de acesso.
+            </p>
+
+            <div class="form-group">
+              <label for="emailInput">E-mail</label>
+              <input type="email" class="form-control-custom" id="emailInput" name="email"
+                     placeholder="seu@email.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="senhaInput">Senha</label>
+              <input type="password" class="form-control-custom" id="senhaInput" name="senha"
+                     placeholder="Sua senha" required>
+            </div>
+
+            <button type="submit" class="btn-custom btn-custom-primary btn-custom-block">Inscrever-se</button>
+          </div>
+        </form>
+
+        <div th:if="${sucesso != null}" style="text-align:center;">
+          <a th:href="@{/evento}" class="btn-custom btn-custom-outline">Voltar para eventos</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;text-align:center;">
+      <a th:href="@{/}" class="btn-custom btn-custom-outline">Voltar ao início</a>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

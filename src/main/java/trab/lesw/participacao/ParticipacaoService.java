@@ -26,24 +26,42 @@ public class ParticipacaoService {
 	@Autowired
 	private MedalhaService medalhaService;
 
+	public String inscrever(Long usuarioId, Long eventoId) {
+	    if (repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
+	        return "Usuário já está inscrito nesse evento!";
+	    }
+	    Evento evento = eventoRepository.getReferenceById(eventoId);
+	    Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
+	    Participacao p = new Participacao();
+	    p.setUsuario(usuario);
+	    p.setEvento(evento);
+	    p.setPontosGanhos(0);
+	    p.setConfirmado(false);
+	    repository.save(p);
+	    return "Inscrição realizada com sucesso!";
+	}
+
 	public String participar(Long usuarioId, Long eventoId) {
-		if (repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
-			return "Usuário já está inscrito nesse evento!";
-		}
-		Evento evento = eventoRepository.getReferenceById(eventoId);
-		Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
-		Participacao p = new Participacao();
-		p.setUsuario(usuario);
-		p.setEvento(evento);
-		p.setPontosGanhos(evento.getPontos());
-		repository.save(p);
+	    if (!repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
+	        return "Usuário não está inscrito nesse evento!";
+	    }
+	    if (repository.existsByUsuarioIdAndEventoIdAndConfirmadoTrue(usuarioId, eventoId)) {
+	        return "Usuário já confirmou participação nesse evento!";
+	    }
+	    Evento evento = eventoRepository.getReferenceById(eventoId);
+	    Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
 
-		medalhaService.awardMedal(usuario, evento);
+	    Participacao p = repository.findByUsuarioIdAndEventoId(usuarioId, eventoId);
+	    p.setConfirmado(true);
+	    p.setPontosGanhos(evento.getPontos());
+	    repository.save(p);
 
-		Integer total = repository.sumPontosByUsuarioId(usuario.getId());
-		medalhaService.awardMedalByPoints(usuario, total != null ? total : 0);
+	    medalhaService.awardMedal(usuario, evento);
 
-		return "Participação registrada!";
+	    Integer total = repository.sumPontosByUsuarioId(usuario.getId());
+	    medalhaService.awardMedalByPoints(usuario, total != null ? total : 0);
+
+	    return "Participação confirmada!";
 	}
 
 	public List<Participacao> getAll() {

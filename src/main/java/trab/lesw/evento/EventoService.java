@@ -42,10 +42,30 @@ public class EventoService {
     }
 
     public Evento getById(Long id) {
-        return eventoRepository.getReferenceById(id);
+        return eventoRepository.findById(id).orElseThrow(() -> new RuntimeException("Evento não encontrado: " + id));
     }
 
-    public String save(Evento evento, List<Long> tagIds, List<Long> organizadorIds, List<Long> palestranteIds, List<Long> professorIds) {
+    public String save(Evento formEvento, List<Long> tagIds, List<Long> organizadorIds, List<Long> palestranteIds, List<Long> professorIds) {
+        Evento evento;
+        if (formEvento.getId() != null) {
+            evento = eventoRepository.findById(formEvento.getId()).orElse(null);
+            if (evento == null) {
+                return "Evento não encontrado!";
+            }
+            evento.setTitulo(formEvento.getTitulo());
+            evento.setDescricao(formEvento.getDescricao());
+            evento.setTipo(formEvento.getTipo());
+            evento.setData(formEvento.getData());
+            evento.setHoraInicio(formEvento.getHoraInicio());
+            evento.setHoraFim(formEvento.getHoraFim());
+            evento.setImagemUrl(formEvento.getImagemUrl());
+            evento.setMensagemPublicacao(formEvento.getMensagemPublicacao());
+            evento.setPublicado(formEvento.getPublicado());
+            evento.setConcluido(formEvento.getConcluido());
+        } else {
+            evento = formEvento;
+            evento.setPontos(1);
+        }
         if (tagIds != null && !tagIds.isEmpty()) {
             List<Tag> tags = tagRepository.findAllById(tagIds);
             evento.setTags(tags);
@@ -53,7 +73,7 @@ public class EventoService {
             evento.setTags(new ArrayList<>());
         }
         if (evento.getDisciplina() != null && evento.getDisciplina().getId() != null) {
-            Disciplina disciplina = disciplinaRepository.getReferenceById(evento.getDisciplina().getId());
+            Disciplina disciplina = disciplinaRepository.findById(evento.getDisciplina().getId()).orElse(null);
             evento.setDisciplina(disciplina);
         } else {
             evento.setDisciplina(null);
@@ -73,7 +93,6 @@ public class EventoService {
         } else {
             evento.setProfessores(new ArrayList<>());
         }
-        evento.setPontos(1);
         eventoRepository.save(evento);
         return "Evento salvo!";
     }

@@ -63,21 +63,34 @@
                 <th>Título</th>
                 <th>Data</th>
                 <th>Início</th>
+                <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="e : ${lista}"
                   th:data-id="${e.id}"
-                  th:data-url="${baseUrl + '/evento/confirmar/' + e.id}">
+                  th:data-url-inscricao="${baseUrl + '/evento/inscricao/' + e.id}"
+                  th:data-url-confirmar="${baseUrl + '/evento/confirmar/' + e.id}"
+                  th:data-concluido="${e.concluido}">
                 <td th:text="${e.id}"></td>
                 <td th:text="${e.titulo}"></td>
                 <td th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}"></td>
                 <td th:text="${e.horaInicio}"></td>
                 <td>
+                  <span th:if="${e.concluido == true}" class="badge-custom" style="background:var(--success-light);color:var(--success);">Concluído</span>
+                  <span th:unless="${e.concluido == true}" class="badge-custom" style="background:var(--info-light);color:var(--info);">Aberto</span>
+                </td>
+                <td>
                   <div class="actions-cell">
                     <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
-                            onclick="mostrarQrCode(this)">QR Code</button>
+                            th:classappend="${e.concluido == true ? 'btn-disabled' : ''}"
+                            onclick="mostrarQrCodeInscricao(this)">Inscrever-se</button>
+                    <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
+                            th:classappend="${e.concluido != true ? 'btn-disabled' : ''}"
+                            onclick="mostrarQrCodeConfirmar(this)">Confirmar</button>
+                    <a th:href="@{'/evento/participantes/' + ${e.id}}"
+                       class="btn-custom btn-custom-outline btn-custom-sm">Participantes</a>
                     <a th:href="@{'/evento/formulario/' + ${e.id}}"
                        class="btn-custom btn-custom-outline btn-custom-sm">Editar</a>
                     <a th:href="@{'/evento/delete/' + ${e.id}}"
@@ -101,7 +114,7 @@
 <div class="qr-modal-backdrop" id="qrModalBackdrop"></div>
 <div class="qr-modal" id="qrCodeModal">
   <div class="qr-modal-header">
-    <h5>QR Code do Evento</h5>
+    <h5 id="qrModalTitle">QR Code do Evento</h5>
     <button type="button" class="qr-modal-close" onclick="fecharQrCode()">&times;</button>
   </div>
   <div class="qr-modal-body">
@@ -115,14 +128,40 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function mostrarQrCode(btn) {
+var tipoQrAtual = '';
+
+function mostrarQrCodeInscricao(btn) {
   var row = btn.closest('tr');
-  var url = row.dataset.url;
+  var concluido = row.dataset.concluido === 'true';
+  if (concluido) {
+    alert('Este evento já foi concluído. Não é possível realizar inscrição.');
+    return;
+  }
+  tipoQrAtual = 'inscricao';
+  var url = row.dataset.urlInscricao;
+  document.getElementById('qrModalTitle').textContent = 'QR Code - Inscrição';
   document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
   document.getElementById('qrCodeUrl').textContent = url;
   document.getElementById('qrCodeModal').classList.add('show');
   document.getElementById('qrModalBackdrop').classList.add('show');
 }
+
+function mostrarQrCodeConfirmar(btn) {
+  var row = btn.closest('tr');
+  var concluido = row.dataset.concluido === 'true';
+  if (!concluido) {
+    alert('Este evento ainda não foi concluído. A confirmação só estará disponível após a conclusão.');
+    return;
+  }
+  tipoQrAtual = 'confirmar';
+  var url = row.dataset.urlConfirmar;
+  document.getElementById('qrModalTitle').textContent = 'QR Code - Confirmar Participação';
+  document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
+  document.getElementById('qrCodeUrl').textContent = url;
+  document.getElementById('qrCodeModal').classList.add('show');
+  document.getElementById('qrModalBackdrop').classList.add('show');
+}
+
 function fecharQrCode() {
   document.getElementById('qrCodeModal').classList.remove('show');
   document.getElementById('qrModalBackdrop').classList.remove('show');

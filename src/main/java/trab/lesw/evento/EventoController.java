@@ -25,6 +25,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import trab.lesw.disciplina.DisciplinaRepository;
 import trab.lesw.linkedin.LinkedInService;
+import trab.lesw.participacao.Participacao;
+import trab.lesw.participacao.ParticipacaoRepository;
 import trab.lesw.participacao.ParticipacaoService;
 import trab.lesw.tag.TagRepository;
 import trab.lesw.usuario.Usuario;
@@ -52,6 +54,9 @@ public class EventoController {
 	private ParticipacaoService participacaoService;
 
 	@Autowired
+	private ParticipacaoRepository participacaoRepository;
+
+	@Autowired
 	private LinkedInService linkedInService;
 
 	@Autowired
@@ -63,6 +68,22 @@ public class EventoController {
 		String baseUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
 		model.addAttribute("baseUrl", baseUrl);
 		return "evento/listagem";
+	}
+
+	@GetMapping("/participantes/{id}")
+	public String participantes(@PathVariable Long id, Model model) {
+		Evento evento = service.getById(id);
+		model.addAttribute("evento", evento);
+
+		List<Participacao> inscritos = participacaoRepository.findByEventoIdAndConfirmado(id, false);
+		List<Participacao> confirmados = participacaoRepository.findByEventoIdAndConfirmado(id, true);
+
+		model.addAttribute("inscritos", inscritos);
+		model.addAttribute("totalInscritos", inscritos.size());
+		model.addAttribute("confirmados", confirmados);
+		model.addAttribute("totalConfirmados", confirmados.size());
+
+		return "evento/participantes";
 	}
 
 	@GetMapping("/formulario")
@@ -118,6 +139,46 @@ public class EventoController {
 	    return "evento/formulario";
 	}
 
+	@GetMapping("/inscricao/{id}")
+	public String inscricaoForm(@PathVariable Long id, Model model) {
+		model.addAttribute("evento", service.getById(id));
+		return "evento/inscricao";
+	}
+
+	@PostMapping("/inscricao/{id}")
+	public String inscrever(@PathVariable Long id,
+							@RequestParam String email,
+							@RequestParam String senha,
+							RedirectAttributes attr) {
+		Evento evento = service.getById(id);
+
+		if (Boolean.TRUE.equals(evento.getConcluido())) {
+			attr.addFlashAttribute("erro", "Este evento já foi concluído, não é mais possível se inscrever.");
+			return "redirect:/evento/inscricao/" + id;
+		}
+
+		Optional<Usuario> opt = usuarioRepository.findByEmailAndSenha(email, senha);
+		if (opt.isEmpty()) {
+			attr.addFlashAttribute("erro", "E-mail ou senha inválidos.");
+			return "redirect:/evento/inscricao/" + id;
+		}
+
+		Usuario usuario = opt.get();
+		if (!usuario.getTipo().equals("ALUNO") && !usuario.getTipo().equals("EXTERNO")) {
+			attr.addFlashAttribute("erro", "Apenas alunos e externos podem se inscrever no evento.");
+			return "redirect:/evento/inscricao/" + id;
+		}
+
+		String msg = participacaoService.inscrever(usuario.getId(), id);
+		if (msg.equals("Usuário já está inscrito nesse evento!")) {
+			attr.addFlashAttribute("erro", msg);
+			return "redirect:/evento/inscricao/" + id;
+		}
+
+		attr.addFlashAttribute("sucesso", msg);
+		return "redirect:/evento/inscricao/" + id;
+	}
+
 	@GetMapping("/confirmar/{id}")
 	public String confirmarForm(@PathVariable Long id, Model model) {
 		model.addAttribute("evento", service.getById(id));
@@ -130,6 +191,11 @@ public class EventoController {
 							@RequestParam String senha,
 							RedirectAttributes attr) {
 		Evento evento = service.getById(id);
+
+		if (!Boolean.TRUE.equals(evento.getConcluido())) {
+			attr.addFlashAttribute("erro", "Evento ainda não foi concluído. A confirmação só está disponível após a conclusão do evento.");
+			return "redirect:/evento/confirmar/" + id;
+		}
 
 		Optional<Usuario> opt = usuarioRepository.findByEmailAndSenha(email, senha);
 		if (opt.isEmpty()) {
@@ -144,7 +210,11 @@ public class EventoController {
 		}
 
 		String msg = participacaoService.participar(usuario.getId(), id);
-		if (msg.equals("Usuário já está inscrito nesse evento!")) {
+		if (msg.equals("Usuário não está inscrito nesse evento!")) {
+			attr.addFlashAttribute("erro", msg);
+			return "redirect:/evento/confirmar/" + id;
+		}
+		if (msg.equals("Usuário já confirmou participação nesse evento!")) {
 			attr.addFlashAttribute("erro", msg);
 			return "redirect:/evento/confirmar/" + id;
 		}

@@ -277,6 +277,12 @@ body {
   font-size: .8125rem;
 }
 
+.btn-disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .btn-custom-lg {
   padding: 12px 28px;
   font-size: 1rem;
@@ -340,9 +346,14 @@ textarea.form-control-custom {
 }
 
 .invalid-feedback {
+  display: none;
   font-size: .75rem;
   color: var(--danger);
   margin-top: 2px;
+}
+
+.form-control-custom.is-invalid ~ .invalid-feedback {
+  display: block;
 }
 
 .form-control-custom.is-invalid {

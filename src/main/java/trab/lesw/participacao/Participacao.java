@@ -44,4 +44,6 @@ public class Participacao implements Serializable {
     private Evento evento;
 
     private Integer pontosGanhos;
+
+    private Boolean confirmado = false;
 }

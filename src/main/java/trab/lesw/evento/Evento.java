@@ -25,6 +25,8 @@ import trab.lesw.disciplina.Disciplina;
 import trab.lesw.tag.Tag;
 import trab.lesw.usuario.Usuario;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Entity
 @Table(name = "evento")
 @Getter
@@ -46,10 +48,13 @@ public class Evento implements Serializable {
     
     private String tipo;
     
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate data;
 
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime horaInicio;
 
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime horaFim;
 
     private Integer pontos = 1;
@@ -60,6 +65,8 @@ public class Evento implements Serializable {
     private String mensagemPublicacao;
 
     private Boolean publicado = false;
+
+    private Boolean concluido = false;
 
     @ManyToMany
     @JoinTable(

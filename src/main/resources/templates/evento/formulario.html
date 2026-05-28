@@ -192,6 +192,13 @@
                 <div id="hidden-tags"></div>
               </div>
 
+              <div class="form-group">
+                <label style="flex-direction:row;align-items:center;gap:8px;cursor:pointer;">
+                  <input type="checkbox" th:field="*{concluido}" id="eventoConcluido"
+                         style="width:18px;height:18px;accent-color:var(--primary);">
+                  Evento concluído
+                </label>
+              </div>
             </div>
           </div>
 
@@ -214,14 +221,7 @@
                           id="mensagemPublicacao"
                           rows="5"
                           placeholder="Escreva a mensagem para ser publicada nas redes sociais..."></textarea>
-                <div style="font-size:.75rem;color:var(--gray-400);">Texto usado ao publicar o evento no LinkedIn e outras redes.</div>
-              </div>
-              <div class="form-group">
-                <label style="flex-direction:row;align-items:center;gap:8px;cursor:pointer;">
-                  <input type="checkbox" th:field="*{publicado}" id="eventoPublicado"
-                         style="width:18px;height:18px;accent-color:var(--primary);">
-                  Evento já publicado
-                </label>
+                <div style="font-size:.75rem;color:var(--gray-400);">Texto usado ao publicar o evento no LinkedIn.</div>
               </div>
             </div>
           </div>
@@ -488,7 +488,6 @@ function mudarTab(el, targetId) {
   if (target) target.classList.add('show', 'active');
   return false;
 }
-
 document.addEventListener('click', function(e) {
     ['organizadores', 'palestrantes', 'professores', 'disciplina', 'tags'].forEach(function(tipo) {
         var input = document.getElementById('busca-' + tipo);

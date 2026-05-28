@@ -32,6 +32,12 @@ public class MedalhaService {
 
     public String save(Medalha medalha) {
         boolean isNovo = medalha.getId() == null;
+
+        if (!MEDALHA_PONTOS.equals(medalha.getNome())
+                && repository.countByUsuarioIdAndNome(medalha.getUsuario().getId(), medalha.getNome()) > 0) {
+            return "Já existe uma medalha com este nome para este usuário!";
+        }
+
         repository.save(medalha);
         return isNovo ? "Medalha criada com sucesso!" : "Medalha atualizada com sucesso!";
     }
@@ -47,6 +53,9 @@ public class MedalhaService {
             return;
         }
         for (Tag tag : tags) {
+            if (repository.countByUsuarioIdAndNome(usuario.getId(), tag.getNome()) > 0) {
+                continue;
+            }
             Medalha medalha = new Medalha();
             medalha.setNome(tag.getNome());
             medalha.setUsuario(usuario);

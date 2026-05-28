@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfStamper;
 
 import trab.lesw.usuario.Usuario;

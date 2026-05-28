@@ -38,8 +38,7 @@
 
     <div class="card-custom">
       <div class="card-custom-body">
-        <form th:action="@{/disciplina/salvar}" th:object="${disciplina}" method="post"
-              novalidate onsubmit="return validarFormDisciplina(this)">
+        <form th:action="@{/disciplina/salvar}" th:object="${disciplina}" method="post">
 
           <input type="hidden" th:field="*{id}"/>
 
@@ -50,7 +49,7 @@
                      id="nomeDisciplina"
                      placeholder="Ex: Engenharia de Software, Redes de Computadores"
                      maxlength="100" required>
-              <div class="invalid-feedback">Nome inválido. Use letras, espaços, hífens e números romanos (mín. 3 caracteres).</div>
+
             </div>
 
             <div class="form-group">
