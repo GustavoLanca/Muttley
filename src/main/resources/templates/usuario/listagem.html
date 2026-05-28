@@ -14,12 +14,14 @@
 <nav class="navbar-muttley">
   <div class="navbar-inner">
     <a th:href="@{/}" class="navbar-brand">
-      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M16 2L2 12v8l14 10 14-10v-8L16 2z"/>
-        <path d="M8 16l4 4 8-8"/>
-      </svg>
+      <img th:src="@{/muttleyR.png}" alt="Muttley">
       Muttley
     </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="navbar-links">
       <a th:href="@{/}">Início</a>
       <a th:href="@{/evento}">Eventos</a>
@@ -72,10 +74,10 @@
                   th:data-tipo="${u.tipo}"
                   th:data-pontos="${pontosMap.get(u.id) ?: 0}"
                   th:data-medalhas="${#strings.listJoin(medalhasMap.get(u.id).![nome], ', ')}">
-                <td th:text="${u.id}"></td>
-                <td th:text="${u.nome}"></td>
-                <td><span class="badge-custom" th:text="${u.tipo}"></span></td>
-                <td>
+                <td data-label="ID" th:text="${u.id}"></td>
+                <td data-label="Nome" th:text="${u.nome}"></td>
+                <td data-label="Tipo"><span class="badge-custom" th:text="${u.tipo}"></span></td>
+                <td data-label="Ações">
                   <div class="actions-cell">
                     <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
                             onclick="verDetalhesUsuario(this)">Medalhas</button>
