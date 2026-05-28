@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import trab.lesw.certificado.Certificado;
 import trab.lesw.certificado.CertificadoRepository;
+import trab.lesw.certificado.CertificadoService;
 import trab.lesw.disciplina.DisciplinaRepository;
 import trab.lesw.linkedin.LinkedInService;
 import trab.lesw.participacao.Participacao;

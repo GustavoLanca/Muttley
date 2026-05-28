@@ -1,4 +1,4 @@
-package trab.lesw.evento;
+package trab.lesw.certificado;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -14,6 +14,7 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfStamper;
 
+import trab.lesw.evento.Evento;
 import trab.lesw.usuario.Usuario;
 
 @Service
@@ -69,11 +70,11 @@ public class CertificadoService {
                 long horas = minutos / 60;
                 long minRestantes = minutos % 60;
                 if (horas > 0 && minRestantes > 0) {
-                    duracao = horas + " horas " + minRestantes + "min.";
+                    duracao = horas + " hora(s) " + minRestantes + "minutos.";
                 } else if (horas > 0) {
                     duracao = horas + " horas.";
                 } else {
-                    duracao = minRestantes + "min";
+                    duracao = minRestantes + "minutos.";
                 }
             }
 
