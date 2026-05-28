@@ -61,10 +61,10 @@
 
             <div class="form-group">
               <label for="senhaUsuario">Senha</label>
-              <input type="password" class="form-control-custom" th:field="*{senha}"
-                     id="senhaUsuario" maxlength="100"
+              <input type="password" class="form-control-custom" name="senha"
+                     th:value="*{senha}" id="senhaUsuario" maxlength="100"
                      th:required="${usuario.id == null}"
-                     th:placeholder="${usuario.id != null} ? 'Deixe em branco para manter' : 'Digite a senha'">
+                     th:placeholder="${usuario.id != null} ? 'Digite sua senha' : 'Digite a senha'">
               <div class="invalid-feedback">Informe uma senha.</div>
             </div>
 

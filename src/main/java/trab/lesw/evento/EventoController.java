@@ -219,6 +219,10 @@ public class EventoController {
 			return "redirect:/evento/confirmar/" + id;
 		}
 
+		if (usuario.getLinkedinToken() == null) {
+			return "redirect:/linkedin/auth?usuarioId=" + usuario.getId() + "&eventoId=" + id;
+		}
+
 		String linkedinMsg = linkedInService.publishEvent(usuario, evento);
 		attr.addFlashAttribute("linkedinMsg", linkedinMsg);
 

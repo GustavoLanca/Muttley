@@ -53,12 +53,13 @@ public class LinkedInService {
     private static final String API_BASE = "https://api.linkedin.com";
     private static final String SCOPES = "openid profile email w_member_social";
 
-    public String getAuthorizationUrl(Long usuarioId) {
+    public String getAuthorizationUrl(Long usuarioId, Long eventoId) {
+        String state = eventoId != null ? usuarioId + ":" + eventoId : String.valueOf(usuarioId);
         return AUTH_URL + "?response_type=code"
             + "&client_id=" + config.getClientId()
             + "&redirect_uri=" + URLEncoder.encode(config.getRedirectUri(), StandardCharsets.UTF_8)
             + "&scope=" + SCOPES.replace(" ", "%20")
-            + "&state=" + usuarioId;
+            + "&state=" + state;
     }
 
     public TokenResponse exchangeCodeForToken(String code) {

@@ -71,7 +71,6 @@ public class UsuarioController {
     @GetMapping("/formulario/{id}")
     public String editar(@PathVariable Long id, Model model) {
         Usuario usuario = service.getById(id);
-        usuario.setSenha(null);
         model.addAttribute("usuario", usuario);
         return "usuario/formulario";
     }

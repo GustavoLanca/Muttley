@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import trab.lesw.evento.Evento;
+import trab.lesw.evento.EventoRepository;
 import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
 
@@ -21,9 +23,13 @@ public class LinkedInController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private EventoRepository eventoRepository;
+
     @GetMapping("/auth")
-    public RedirectView auth(@RequestParam Long usuarioId) {
-        String url = linkedInService.getAuthorizationUrl(usuarioId);
+    public RedirectView auth(@RequestParam Long usuarioId,
+                             @RequestParam(required = false) Long eventoId) {
+        String url = linkedInService.getAuthorizationUrl(usuarioId, eventoId);
         return new RedirectView(url);
     }
 
@@ -32,7 +38,9 @@ public class LinkedInController {
                            @RequestParam String state,
                            RedirectAttributes attr) {
         try {
-            Long usuarioId = Long.parseLong(state);
+            String[] parts = state.split(":", 2);
+            Long usuarioId = Long.parseLong(parts[0]);
+            Long eventoId = parts.length > 1 ? Long.parseLong(parts[1]) : null;
 
             LinkedInService.TokenResponse tokenResponse = linkedInService.exchangeCodeForToken(code);
             String personId = linkedInService.getPersonId(tokenResponse.accessToken);
@@ -48,6 +56,15 @@ public class LinkedInController {
                 System.currentTimeMillis() / 1000 + tokenResponse.expiresIn);
             usuario.setLinkedinPersonId(personId);
             usuarioRepository.save(usuario);
+
+            if (eventoId != null) {
+                Evento evento = eventoRepository.findById(eventoId).orElse(null);
+                if (evento != null) {
+                    String result = linkedInService.publishEvent(usuario, evento);
+                    attr.addFlashAttribute("linkedinMsg", result);
+                }
+                return "redirect:/evento/confirmado/" + eventoId + "/" + usuarioId;
+            }
 
             String result = linkedInService.exportMedals(usuario);
             attr.addFlashAttribute("message", result);

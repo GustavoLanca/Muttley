@@ -41,10 +41,17 @@ public class UsuarioService {
 
     public String save(Usuario usuario) {
     	boolean isNovo = usuario.getId() == null;
-    	if (!isNovo && (usuario.getSenha() == null || usuario.getSenha().isBlank())) {
+    	if (!isNovo) {
     	    Usuario existente = repository.findById(usuario.getId()).orElse(null);
     	    if (existente != null) {
-    	        usuario.setSenha(existente.getSenha());
+    	        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
+    	            usuario.setSenha(existente.getSenha());
+    	        }
+    	        if (usuario.getLinkedinToken() == null) {
+    	            usuario.setLinkedinToken(existente.getLinkedinToken());
+    	            usuario.setLinkedinTokenExpires(existente.getLinkedinTokenExpires());
+    	            usuario.setLinkedinPersonId(existente.getLinkedinPersonId());
+    	        }
     	    }
     	}
     	repository.save(usuario);

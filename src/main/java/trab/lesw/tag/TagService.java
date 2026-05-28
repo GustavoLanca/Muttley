@@ -1,6 +1,7 @@
 package trab.lesw.tag;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
  
@@ -20,6 +21,12 @@ public class TagService {
  
     public String save(Tag tag) {
         boolean isNovo = tag.getId() == null;
+
+        Optional<Tag> existing = repository.findByNomeIgnoreCase(tag.getNome());
+        if (existing.isPresent() && (isNovo || !existing.get().getId().equals(tag.getId()))) {
+            return "Já existe uma tag com este nome";
+        }
+
         repository.save(tag);
         return isNovo ? "Tag criada" : "Tag atualizada";
     }
