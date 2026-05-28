@@ -70,7 +70,9 @@ public class UsuarioController {
 
     @GetMapping("/formulario/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("usuario", service.getById(id));
+        Usuario usuario = service.getById(id);
+        usuario.setSenha(null);
+        model.addAttribute("usuario", usuario);
         return "usuario/formulario";
     }
 }
