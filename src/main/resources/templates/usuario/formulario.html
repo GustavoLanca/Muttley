@@ -70,7 +70,8 @@
             <div class="form-group">
               <label for="cpfUsuario">CPF</label>
               <input type="text" class="form-control-custom" th:field="*{cpf}"
-                     id="cpfUsuario" placeholder="000.000.000-00" maxlength="14">
+                     id="cpfUsuario" placeholder="000.000.000-00" maxlength="14" required>
+              <div class="invalid-feedback">Informe um CPF com 11 dígitos numéricos.</div>
             </div>
 
             <div class="form-group">
@@ -121,6 +122,13 @@ function validarFormUsuario(form) {
     if (input.id === 'nomeUsuario' && input.value.trim().length < 5) {
       input.classList.add('is-invalid');
       valido = false;
+    }
+    if (input.id === 'cpfUsuario' && input.value.trim()) {
+      var digits = input.value.replace(/\D/g, '');
+      if (digits.length !== 11) {
+        input.classList.add('is-invalid');
+        valido = false;
+      }
     }
 
   });
