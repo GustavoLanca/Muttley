@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +38,7 @@ public class Tag implements Serializable {
     @Column(unique = true)
     private String nome;
     
+    @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private List<Evento> eventos = new ArrayList<>();
 }

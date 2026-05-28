@@ -52,7 +52,7 @@ public class Usuario implements Serializable {
     private String cpf;
     
     private String tipo;
-
+    
     @OneToMany(mappedBy = "usuario")
     private List<Medalha> medalhas;
 

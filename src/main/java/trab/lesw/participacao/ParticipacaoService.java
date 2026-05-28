@@ -72,4 +72,8 @@ public class ParticipacaoService {
 		Integer total = repository.sumPontosByUsuarioId(usuarioId);
 		return total != null ? total : 0;
 	}
+	
+	public List<Participacao> participacoes(Long eventoId){
+		return repository.findByEventoIdWithUsuario(eventoId);
+	}
 }
