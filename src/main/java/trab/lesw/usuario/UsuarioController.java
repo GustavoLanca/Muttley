@@ -1,5 +1,6 @@
 package trab.lesw.usuario;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.transaction.Transactional;
+import trab.lesw.certificado.Certificado;
+import trab.lesw.certificado.CertificadoRepository;
 import trab.lesw.medalha.MedalhaService;
 import trab.lesw.participacao.ParticipacaoService;
 
@@ -27,6 +30,9 @@ public class UsuarioController {
     @Autowired
     private MedalhaService medalhaService;
 
+    @Autowired
+    private CertificadoRepository certificadoRepository;
+
     @GetMapping
     public String listar(Model model) {
         List<Usuario> usuarios = service.getAll();
@@ -40,9 +46,27 @@ public class UsuarioController {
                 Usuario::getId,
                 u -> medalhaService.getMedalhasByUsuarioId(u.getId())
             ));
+        Map<Long, List<Certificado>> certificadosMap = usuarios.stream()
+            .collect(Collectors.toMap(
+                Usuario::getId,
+                u -> certificadoRepository.findByUsuarioIdWithEvento(u.getId())
+            ));
+        Map<Long, String> certificadosDataMap = new HashMap<>();
+        for (Usuario u : usuarios) {
+            List<Certificado> certs = certificadosMap.get(u.getId());
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < certs.size(); i++) {
+                if (i > 0) sb.append("||");
+                sb.append(certs.get(i).getEvento().getId())
+                  .append("|")
+                  .append(certs.get(i).getEvento().getTitulo());
+            }
+            certificadosDataMap.put(u.getId(), sb.toString());
+        }
         model.addAttribute("lista", usuarios);
         model.addAttribute("pontosMap", pontosMap);
         model.addAttribute("medalhasMap", medalhasMap);
+        model.addAttribute("certificadosDataMap", certificadosDataMap);
         return "usuario/listagem";
     }
 

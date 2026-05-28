@@ -59,7 +59,8 @@ public class LinkedInService {
             + "&client_id=" + config.getClientId()
             + "&redirect_uri=" + URLEncoder.encode(config.getRedirectUri(), StandardCharsets.UTF_8)
             + "&scope=" + SCOPES.replace(" ", "%20")
-            + "&state=" + state;
+            + "&state=" + state
+            + "&prompt=consent";
     }
 
     public TokenResponse exchangeCodeForToken(String code) {

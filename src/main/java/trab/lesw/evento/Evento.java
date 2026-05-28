@@ -44,6 +44,7 @@ public class Evento implements Serializable {
 
     private String titulo;
     
+    @Column(columnDefinition = "TEXT")
     private String descricao;
     
     private String tipo;

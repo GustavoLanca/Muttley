@@ -63,6 +63,10 @@ public class LinkedInController {
                     String result = linkedInService.publishEvent(usuario, evento);
                     attr.addFlashAttribute("linkedinMsg", result);
                 }
+                usuario.setLinkedinToken(null);
+                usuario.setLinkedinPersonId(null);
+                usuario.setLinkedinTokenExpires(null);
+                usuarioRepository.save(usuario);
                 return "redirect:/evento/confirmado/" + eventoId + "/" + usuarioId;
             }
 

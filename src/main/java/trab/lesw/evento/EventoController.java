@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import trab.lesw.certificado.Certificado;
+import trab.lesw.certificado.CertificadoRepository;
 import trab.lesw.disciplina.DisciplinaRepository;
 import trab.lesw.linkedin.LinkedInService;
 import trab.lesw.participacao.Participacao;
@@ -61,6 +64,9 @@ public class EventoController {
 
 	@Autowired
 	private CertificadoService certificadoService;
+
+	@Autowired
+	private CertificadoRepository certificadoRepository;
 
 	@GetMapping
 	public String listar(Model model, HttpServletRequest request) {
@@ -164,10 +170,6 @@ public class EventoController {
 		}
 
 		Usuario usuario = opt.get();
-		if (!usuario.getTipo().equals("ALUNO") && !usuario.getTipo().equals("EXTERNO")) {
-			attr.addFlashAttribute("erro", "Apenas alunos e externos podem se inscrever no evento.");
-			return "redirect:/evento/inscricao/" + id;
-		}
 
 		String msg = participacaoService.inscrever(usuario.getId(), id);
 		if (msg.equals("Usuário já está inscrito nesse evento!")) {
@@ -204,10 +206,6 @@ public class EventoController {
 		}
 
 		Usuario usuario = opt.get();
-		if (!usuario.getTipo().equals("ALUNO") && !usuario.getTipo().equals("EXTERNO")) {
-			attr.addFlashAttribute("erro", "Apenas alunos e externos podem confirmar participação.");
-			return "redirect:/evento/confirmar/" + id;
-		}
 
 		String msg = participacaoService.participar(usuario.getId(), id);
 		if (msg.equals("Usuário não está inscrito nesse evento!")) {
@@ -219,14 +217,7 @@ public class EventoController {
 			return "redirect:/evento/confirmar/" + id;
 		}
 
-		if (usuario.getLinkedinToken() == null) {
-			return "redirect:/linkedin/auth?usuarioId=" + usuario.getId() + "&eventoId=" + id;
-		}
-
-		String linkedinMsg = linkedInService.publishEvent(usuario, evento);
-		attr.addFlashAttribute("linkedinMsg", linkedinMsg);
-
-		return "redirect:/evento/confirmado/" + id + "/" + usuario.getId();
+		return "redirect:/linkedin/auth?usuarioId=" + usuario.getId() + "&eventoId=" + id;
 	}
 
 	@GetMapping("/confirmado/{id}/{usuarioId}")
@@ -252,6 +243,22 @@ public class EventoController {
 			byte[] pdfBytes = certificadoService.gerarCertificado(optUsuario.get(), evento);
 			if (pdfBytes.length == 0) {
 				return ResponseEntity.internalServerError().build();
+			}
+
+			if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
+				String projectDir = System.getProperty("user.dir");
+				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
+				Files.createDirectories(uploadPath);
+				String nomeArquivo = usuarioId + "_" + eventoId + ".pdf";
+				Path destino = uploadPath.resolve(nomeArquivo);
+				Files.write(destino, pdfBytes);
+
+				Certificado cert = new Certificado();
+				cert.setUsuario(optUsuario.get());
+				cert.setEvento(evento);
+				cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
+				cert.setDataEmissao(LocalDateTime.now());
+				certificadoRepository.save(cert);
 			}
 
 			ByteArrayInputStream in = new ByteArrayInputStream(pdfBytes);

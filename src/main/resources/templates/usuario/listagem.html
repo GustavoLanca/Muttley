@@ -73,7 +73,8 @@
                   th:data-linkedin="${u.linkedin}"
                   th:data-tipo="${u.tipo}"
                   th:data-pontos="${pontosMap.get(u.id) ?: 0}"
-                  th:data-medalhas="${#strings.listJoin(medalhasMap.get(u.id).![nome], ', ')}">
+                  th:data-medalhas="${#strings.listJoin(medalhasMap.get(u.id).![nome], ', ')}"
+                  th:data-certificados="${certificadosDataMap.get(u.id) ?: ''}">
                 <td data-label="ID" th:text="${u.id}"></td>
                 <td data-label="Nome" th:text="${u.nome}"></td>
                 <td data-label="Tipo"><span class="badge-custom" th:text="${u.tipo}"></span></td>
@@ -120,6 +121,27 @@ function verDetalhesUsuario(btn) {
   var html = '';
   html += '<p><strong>Total Pontos:</strong> ' + row.dataset.pontos + '</p>';
   html += '<p><strong>Medalhas:</strong> ' + (row.dataset.medalhas || '—') + '</p>';
+  html += '<hr><p><strong>Certificados:</strong></p>';
+  var certData = row.dataset.certificados;
+  if (certData) {
+    var items = certData.split('||');
+    if (items.length > 0 && items[0] !== '') {
+      html += '<ul style="list-style:none;padding:0;margin:0;">';
+      for (var i = 0; i < items.length; i++) {
+        var parts = items[i].split('|');
+        var eventoId = parts[0];
+        var eventoTitulo = parts[1];
+        html += '<li style="margin-bottom:6px;">';
+        html += '<a href="/evento/certificado/' + eventoId + '/' + row.dataset.id + '" class="btn-custom btn-custom-sm btn-custom-outline" style="font-size:13px;">';
+        html += eventoTitulo + '</a></li>';
+      }
+      html += '</ul>';
+    } else {
+      html += '<p style="color:#888;">Nenhum certificado disponível.</p>';
+    }
+  } else {
+    html += '<p style="color:#888;">Nenhum certificado disponível.</p>';
+  }
   document.getElementById('detalhesUsuarioBody').innerHTML = html;
   document.getElementById('detalhesUsuarioModal').classList.add('show');
   document.getElementById('modalOverlay').classList.add('show');

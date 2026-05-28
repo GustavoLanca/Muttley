@@ -22,6 +22,10 @@ public class TagService {
     public String save(Tag tag) {
         boolean isNovo = tag.getId() == null;
 
+        if (tag.getNome() == null || tag.getNome().isBlank()) {
+            return "O nome da tag não pode estar vazio.";
+        }
+
         Optional<Tag> existing = repository.findByNomeIgnoreCase(tag.getNome());
         if (existing.isPresent() && (isNovo || !existing.get().getId().equals(tag.getId()))) {
             return "Já existe uma tag com este nome";

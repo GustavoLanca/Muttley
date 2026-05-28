@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import trab.lesw.certificado.CertificadoRepository;
 import trab.lesw.disciplina.DisciplinaRepository;
 import trab.lesw.evento.Evento;
 import trab.lesw.evento.EventoRepository;
@@ -28,10 +29,13 @@ public class UsuarioService {
     @Autowired
     private EventoRepository eventoRepository;
 
-    @Autowired
-    private DisciplinaRepository disciplinaRepository;
+	@Autowired
+	private DisciplinaRepository disciplinaRepository;
 
-    public List<Usuario> getAll() {
+	@Autowired
+	private CertificadoRepository certificadoRepository;
+
+	public List<Usuario> getAll() {
         return repository.findAll(Sort.by("nome").ascending());
     }
 
@@ -60,6 +64,7 @@ public class UsuarioService {
 
     @Transactional
     public String delete(Long id) {
+        certificadoRepository.findByUsuarioId(id).forEach(c -> certificadoRepository.delete(c));
         participacaoRepository.findByUsuarioId(id).forEach(p -> participacaoRepository.delete(p));
         medalhaRepository.findByUsuarioId(id).forEach(m -> medalhaRepository.delete(m));
 

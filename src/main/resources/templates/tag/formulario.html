@@ -65,5 +65,18 @@
   </div>
 </main>
 
+<script>
+function validarFormTag(form) {
+  var valido = true;
+  form.querySelectorAll('.form-control-custom').forEach(function(input) {
+    input.classList.remove('is-invalid');
+    if (!input.value.trim()) {
+      input.classList.add('is-invalid');
+      valido = false;
+    }
+  });
+  return valido;
+}
+</script>
 </body>
 </html>

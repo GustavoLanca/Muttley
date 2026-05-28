@@ -76,9 +76,7 @@
                           rows="3"
                           placeholder="Descreva brevemente o evento..."
                           maxlength="500"></textarea>
-                <div class="invalid-feedback">
-                  Descrição muito curta (mín. 10 caracteres) ou com caracteres inválidos.
-                </div>
+
               </div>
 
               <div class="form-group">
@@ -489,6 +487,41 @@ function mudarTab(el, targetId) {
   var target = document.getElementById(targetId);
   if (target) target.classList.add('show', 'active');
   return false;
+}
+function validarFormEvento(form) {
+  var valido = true;
+  var firstInvalidTab = null;
+  form.querySelectorAll('.form-control-custom').forEach(function(input) {
+    input.classList.remove('is-invalid');
+    var tab = input.closest('.tab-pane');
+    if (input.hasAttribute('required') && !input.value.trim()) {
+      input.classList.add('is-invalid');
+      valido = false;
+      if (tab && !firstInvalidTab) firstInvalidTab = tab;
+    }
+    if (input.type === 'email' && input.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+      input.classList.add('is-invalid');
+      valido = false;
+      if (tab && !firstInvalidTab) firstInvalidTab = tab;
+    }
+    if (input.id === 'horaInicio' && input.value.trim() && document.getElementById('horaFim').value.trim()) {
+      if (document.getElementById('horaFim').value <= input.value) {
+        input.classList.add('is-invalid');
+        document.getElementById('horaFim').classList.add('is-invalid');
+        valido = false;
+        if (tab && !firstInvalidTab) firstInvalidTab = tab;
+      }
+    }
+  });
+  if (!valido && firstInvalidTab) {
+    var tabId = firstInvalidTab.id;
+    document.querySelectorAll('.tab-nav a').forEach(function(a) {
+      if (a.getAttribute('onclick') && a.getAttribute('onclick').includes(tabId)) {
+        mudarTab(a, tabId);
+      }
+    });
+  }
+  return valido;
 }
 document.addEventListener('click', function(e) {
     ['organizadores', 'palestrantes', 'professores', 'disciplina', 'tags'].forEach(function(tipo) {

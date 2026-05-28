@@ -33,29 +33,20 @@ public class CertificadoService {
             AcroFields form = stamper.getAcroFields();
 
 //Carregar fonte
-            BaseFont calibriBold = null;
             BaseFont calibriRegular = null;
-            try (InputStream boldStream = getClass().getClassLoader().getResourceAsStream("fonts/calibrib.ttf");
-                 InputStream regularStream = getClass().getClassLoader().getResourceAsStream("fonts/calibri.ttf")) {
-    
-                if (boldStream != null) {
-                    byte[] boldBytes = boldStream.readAllBytes();
-                    calibriBold = BaseFont.createFont("calibrib.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED, BaseFont.CACHED, boldBytes, null);
-                }
+            try (InputStream regularStream = getClass().getClassLoader().getResourceAsStream("calibri-font-family/calibri-regular.ttf")) {
                 if (regularStream != null) {
                     byte[] regularBytes = regularStream.readAllBytes();
-                    calibriRegular = BaseFont.createFont("calibri.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED, BaseFont.CACHED, regularBytes, null);
+                    calibriRegular = BaseFont.createFont("calibri-regular.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED, BaseFont.CACHED, regularBytes, null);
                 }
             } catch (Exception e) {
 //Esta dentro de um try catch para caso nao encontre a fonte nao quebre o programa
             }
-            if (calibriBold != null) {
-                form.setFieldProperty("usuarioNome", "textfont", calibriBold, null);
-                form.setFieldProperty("usuarioNome", "textsize", 20.2f, null);
-                form.setFieldProperty("eventoTitulo", "textfont", calibriBold, null);
-                form.setFieldProperty("eventoTitulo", "textsize", 16.5f, null);
-            }
             if (calibriRegular != null) {
+                form.setFieldProperty("usuarioNome", "textfont", calibriRegular, null);
+                form.setFieldProperty("usuarioNome", "textsize", 20.2f, null);
+                form.setFieldProperty("eventoTitulo", "textfont", calibriRegular, null);
+                form.setFieldProperty("eventoTitulo", "textsize", 16.5f, null);
                 form.setFieldProperty("eventoData", "textfont", calibriRegular, null);
                 form.setFieldProperty("eventoData", "textsize", 16.5f, null);
             }
@@ -74,9 +65,9 @@ public class CertificadoService {
                 long horas = minutos / 60;
                 long minRestantes = minutos % 60;
                 if (horas > 0 && minRestantes > 0) {
-                    duracao = horas + "h" + minRestantes + "min";
+                    duracao = horas + " horas. " + minRestantes + "min";
                 } else if (horas > 0) {
-                    duracao = horas + "h";
+                    duracao = horas + " horas.";
                 } else {
                     duracao = minRestantes + "min";
                 }
