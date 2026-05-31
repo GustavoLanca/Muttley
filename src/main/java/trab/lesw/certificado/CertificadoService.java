@@ -72,7 +72,7 @@ public class CertificadoService {
                 if (horas > 0 && minRestantes > 0) {
                     duracao = horas + " hora(s) " + minRestantes + "minutos.";
                 } else if (horas > 0) {
-                    duracao = horas + " horas.";
+                    duracao = horas + " hora(s).";
                 } else {
                     duracao = minRestantes + "minutos.";
                 }

@@ -5,8 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD) // Pode ser usada em métodos
-@Retention(RetentionPolicy.RUNTIME) // Disponível em runtime via reflection
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface ApiKeyRequired {
 	String[] permissions() default {};
 	boolean required() default true;
