@@ -218,7 +218,7 @@ public class EventoController {
 			return "redirect:/evento/confirmar/" + id;
 		}
 
-		if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuario.getId(), id)) {
+		if (Boolean.FALSE.equals(certificadoRepository.existeCertificadoProcedure(usuario.getId(), id))) {
 			try {
 				byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
 				if (pdfBytes.length > 0) {
@@ -269,7 +269,7 @@ public class EventoController {
 				return ResponseEntity.internalServerError().build();
 			}
 
-			if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
+			if (Boolean.FALSE.equals(certificadoRepository.existeCertificadoProcedure(usuarioId, eventoId))) {
 				String projectDir = System.getProperty("user.dir");
 				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
 				Files.createDirectories(uploadPath);

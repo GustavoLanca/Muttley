@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,4 +33,16 @@ public interface ParticipacaoRepository extends JpaRepository<Participacao, Long
 
     @Query("SELECT COUNT(p) FROM Participacao p WHERE p.evento.id = :eventoId AND p.confirmado = :confirmado")
     Long countByEventoIdAndConfirmado(@Param("eventoId") Long eventoId, @Param("confirmado") Boolean confirmado);
+
+    @Procedure(procedureName = "sp_calcular_pontos_usuario")
+    Integer calcularPontosUsuarioProcedure(@Param("p_usuario_id") Long usuarioId);
+
+    @Procedure(procedureName = "sp_contar_participantes_por_evento")
+    Long contarParticipantesPorEventoProcedure(@Param("p_evento_id") Long eventoId, @Param("p_confirmado") Boolean confirmado);
+
+    @Procedure(procedureName = "sp_existe_participacao")
+    Boolean existeParticipacaoProcedure(@Param("p_usuario_id") Long usuarioId, @Param("p_evento_id") Long eventoId);
+
+    @Procedure(procedureName = "sp_existe_participacao_confirmada")
+    Boolean existeParticipacaoConfirmadaProcedure(@Param("p_usuario_id") Long usuarioId, @Param("p_evento_id") Long eventoId, @Param("p_confirmado") Boolean confirmado);
 }
