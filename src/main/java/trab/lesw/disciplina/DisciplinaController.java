@@ -28,17 +28,17 @@ public class DisciplinaController {
     @GetMapping("/formulario")
     public String novo(Model model) {
         model.addAttribute("disciplina", new Disciplina());
-        model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
+        model.addAttribute("professores", usuarioRepository.findAll());
         return "disciplina/formulario";
     }
- 
+
     @GetMapping("/formulario/{id}")
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("disciplina", service.getById(id));
-        model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
+        model.addAttribute("professores", usuarioRepository.findAll());
         return "disciplina/formulario";
     }
- 
+
     @PostMapping("/salvar")
     public String salvar(@ModelAttribute Disciplina disciplina, RedirectAttributes attr) {
         attr.addFlashAttribute("message", service.save(disciplina));

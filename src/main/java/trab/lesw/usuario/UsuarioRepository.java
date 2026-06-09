@@ -11,5 +11,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface UsuarioRepository extends JpaRepository <Usuario, Long> {
 	List<Usuario> findByTipo(String tipo);
-	Optional<Usuario> findByEmailAndSenha(String email, String senha);
+	Optional<Usuario> findByCpf(String cpf);
 }

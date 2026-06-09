@@ -48,9 +48,6 @@ public class UsuarioService {
     	if (!isNovo) {
     	    Usuario existente = repository.findById(usuario.getId()).orElse(null);
     	    if (existente != null) {
-    	        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
-    	            usuario.setSenha(existente.getSenha());
-    	        }
     	        if (usuario.getLinkedinToken() == null) {
     	            usuario.setLinkedinToken(existente.getLinkedinToken());
     	            usuario.setLinkedinTokenExpires(existente.getLinkedinTokenExpires());

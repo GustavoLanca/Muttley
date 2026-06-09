@@ -61,7 +61,10 @@ public class EventoService {
             evento.setImagemUrl(formEvento.getImagemUrl());
             evento.setMensagemPublicacao(formEvento.getMensagemPublicacao());
             evento.setPublicado(formEvento.getPublicado());
-            evento.setConcluido(formEvento.getConcluido());
+            evento.setInicioInscricao(formEvento.getInicioInscricao());
+            evento.setFimInscricao(formEvento.getFimInscricao());
+            evento.setInicioConfirmacao(formEvento.getInicioConfirmacao());
+            evento.setFimConfirmacao(formEvento.getFimConfirmacao());
         } else {
             evento = formEvento;
             evento.setPontos(1);

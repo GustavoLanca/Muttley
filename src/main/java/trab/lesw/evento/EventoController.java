@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,9 +100,9 @@ public class EventoController {
 	    model.addAttribute("evento", new Evento());
 	    model.addAttribute("tags", tagRepository.findAll());
 	    model.addAttribute("disciplinas", disciplinaRepository.findAll());
-	    model.addAttribute("organizadores", usuarioRepository.findByTipo("ORGANIZADOR"));
-	    model.addAttribute("palestrantes", usuarioRepository.findByTipo("PALESTRANTE"));
-	    model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
+	    model.addAttribute("organizadores", usuarioRepository.findAll());
+	    model.addAttribute("palestrantes", usuarioRepository.findAll());
+	    model.addAttribute("professores", usuarioRepository.findAll());
 	    return "evento/formulario";
 	}
 	@PostMapping("/salvar")
@@ -110,7 +112,35 @@ public class EventoController {
 						 @RequestParam(required = false) List<Long> palestrantes,
 						 @RequestParam(required = false) List<Long> professores,
 						 @RequestParam(required = false) MultipartFile imagemFile,
+						 @RequestParam(required = false) String inicioInscricaoDate,
+						 @RequestParam(required = false) String inicioInscricaoTime,
+						 @RequestParam(required = false) String fimInscricaoDate,
+						 @RequestParam(required = false) String fimInscricaoTime,
+						 @RequestParam(required = false) String inicioConfirmacaoDate,
+						 @RequestParam(required = false) String inicioConfirmacaoTime,
+						 @RequestParam(required = false) String fimConfirmacaoDate,
+						 @RequestParam(required = false) String fimConfirmacaoTime,
 						 RedirectAttributes attr) {
+		if (inicioInscricaoDate != null && inicioInscricaoTime != null && !inicioInscricaoDate.isEmpty() && !inicioInscricaoTime.isEmpty()) {
+			evento.setInicioInscricao(LocalDateTime.of(LocalDate.parse(inicioInscricaoDate), LocalTime.parse(inicioInscricaoTime)));
+		} else {
+			evento.setInicioInscricao(null);
+		}
+		if (fimInscricaoDate != null && fimInscricaoTime != null && !fimInscricaoDate.isEmpty() && !fimInscricaoTime.isEmpty()) {
+			evento.setFimInscricao(LocalDateTime.of(LocalDate.parse(fimInscricaoDate), LocalTime.parse(fimInscricaoTime)));
+		} else {
+			evento.setFimInscricao(null);
+		}
+		if (inicioConfirmacaoDate != null && inicioConfirmacaoTime != null && !inicioConfirmacaoDate.isEmpty() && !inicioConfirmacaoTime.isEmpty()) {
+			evento.setInicioConfirmacao(LocalDateTime.of(LocalDate.parse(inicioConfirmacaoDate), LocalTime.parse(inicioConfirmacaoTime)));
+		} else {
+			evento.setInicioConfirmacao(null);
+		}
+		if (fimConfirmacaoDate != null && fimConfirmacaoTime != null && !fimConfirmacaoDate.isEmpty() && !fimConfirmacaoTime.isEmpty()) {
+			evento.setFimConfirmacao(LocalDateTime.of(LocalDate.parse(fimConfirmacaoDate), LocalTime.parse(fimConfirmacaoTime)));
+		} else {
+			evento.setFimConfirmacao(null);
+		}
 		if (imagemFile != null && !imagemFile.isEmpty()) {
 			try {
 				String projectDir = System.getProperty("user.dir");
@@ -140,33 +170,37 @@ public class EventoController {
 	    model.addAttribute("evento", service.getById(id));
 	    model.addAttribute("tags", tagRepository.findAll());
 	    model.addAttribute("disciplinas", disciplinaRepository.findAll());
-	    model.addAttribute("organizadores", usuarioRepository.findByTipo("ORGANIZADOR"));
-	    model.addAttribute("palestrantes", usuarioRepository.findByTipo("PALESTRANTE"));
-	    model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
+	    model.addAttribute("organizadores", usuarioRepository.findAll());
+	    model.addAttribute("palestrantes", usuarioRepository.findAll());
+	    model.addAttribute("professores", usuarioRepository.findAll());
 	    return "evento/formulario";
 	}
 
 	@GetMapping("/inscricao/{id}")
-	public String inscricaoForm(@PathVariable Long id, Model model) {
-		model.addAttribute("evento", service.getById(id));
+	public String inscricaoForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
+		Evento evento = service.getById(id);
+		if (!evento.isInscricaoAberta()) {
+			attr.addFlashAttribute("erro", "Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
+			return "redirect:/evento";
+		}
+		model.addAttribute("evento", evento);
 		return "evento/inscricao";
 	}
 
 	@PostMapping("/inscricao/{id}")
 	public String inscrever(@PathVariable Long id,
-							@RequestParam String email,
-							@RequestParam String senha,
+							@RequestParam String cpf,
 							RedirectAttributes attr) {
 		Evento evento = service.getById(id);
 
-		if (Boolean.TRUE.equals(evento.getConcluido())) {
-			attr.addFlashAttribute("erro", "Este evento já foi concluído, não é mais possível se inscrever.");
+		if (!evento.isInscricaoAberta()) {
+			attr.addFlashAttribute("erro", "Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
 			return "redirect:/evento/inscricao/" + id;
 		}
 
-		Optional<Usuario> opt = usuarioRepository.findByEmailAndSenha(email, senha);
+		Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
 		if (opt.isEmpty()) {
-			attr.addFlashAttribute("erro", "E-mail ou senha inválidos.");
+			attr.addFlashAttribute("erro", "CPF não encontrado.");
 			return "redirect:/evento/inscricao/" + id;
 		}
 
@@ -183,26 +217,30 @@ public class EventoController {
 	}
 
 	@GetMapping("/confirmar/{id}")
-	public String confirmarForm(@PathVariable Long id, Model model) {
-		model.addAttribute("evento", service.getById(id));
+	public String confirmarForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
+		Evento evento = service.getById(id);
+		if (!evento.isConfirmacaoAberta()) {
+			attr.addFlashAttribute("erro", "Confirmação fechada no momento. Verifique o período de confirmação do evento.");
+			return "redirect:/evento";
+		}
+		model.addAttribute("evento", evento);
 		return "evento/confirmar";
 	}
 
 	@PostMapping("/confirmar/{id}")
 	public String confirmar(@PathVariable Long id,
-							@RequestParam String email,
-							@RequestParam String senha,
+							@RequestParam String cpf,
 							RedirectAttributes attr) {
 		Evento evento = service.getById(id);
 
-		if (!Boolean.TRUE.equals(evento.getConcluido())) {
-			attr.addFlashAttribute("erro", "Evento ainda não foi concluído. A confirmação só está disponível após a conclusão do evento.");
+		if (!evento.isConfirmacaoAberta()) {
+			attr.addFlashAttribute("erro", "Confirmação fechada no momento. Verifique o período de confirmação do evento.");
 			return "redirect:/evento/confirmar/" + id;
 		}
 
-		Optional<Usuario> opt = usuarioRepository.findByEmailAndSenha(email, senha);
+		Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
 		if (opt.isEmpty()) {
-			attr.addFlashAttribute("erro", "E-mail ou senha inválidos.");
+			attr.addFlashAttribute("erro", "CPF não encontrado.");
 			return "redirect:/evento/confirmar/" + id;
 		}
 

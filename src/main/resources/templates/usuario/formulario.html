@@ -62,15 +62,6 @@
             </div>
 
             <div class="form-group">
-              <label for="senhaUsuario">Senha</label>
-              <input type="password" class="form-control-custom" name="senha"
-                     th:value="*{senha}" id="senhaUsuario" maxlength="100"
-                     th:required="${usuario.id == null}"
-                     th:placeholder="${usuario.id != null} ? 'Digite sua senha' : 'Digite a senha'">
-              <div class="invalid-feedback">Informe uma senha.</div>
-            </div>
-
-            <div class="form-group">
               <label for="cpfUsuario">CPF</label>
               <input type="text" class="form-control-custom" th:field="*{cpf}"
                      id="cpfUsuario" placeholder="Apenas números" maxlength="11" required>

@@ -192,13 +192,61 @@
                 <div id="hidden-tags"></div>
               </div>
 
-              <div class="form-group">
-                <label style="flex-direction:row;align-items:center;gap:8px;cursor:pointer;">
-                  <input type="checkbox" th:field="*{concluido}" id="eventoConcluido"
-                         style="width:18px;height:18px;accent-color:var(--primary);">
-                  Evento concluído
-                </label>
-              </div>
+              <fieldset style="border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin-top:8px;">
+                <legend style="font-weight:600;font-size:.875rem;color:var(--gray-500);padding:0 8px;">Período de Inscrição</legend>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                  <div class="form-group">
+                    <label>Início</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                      <input type="date" class="form-control-custom"
+                             name="inicioInscricaoDate" id="inicioInscricaoDate"
+                             th:value="${evento.inicioInscricao != null ? #temporals.format(evento.inicioInscricao, 'yyyy-MM-dd') : ''}">
+                      <input type="time" class="form-control-custom"
+                             name="inicioInscricaoTime" id="inicioInscricaoTime"
+                             th:value="${evento.inicioInscricao != null ? #temporals.format(evento.inicioInscricao, 'HH:mm') : ''}">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Fim</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                      <input type="date" class="form-control-custom"
+                             name="fimInscricaoDate" id="fimInscricaoDate"
+                             th:value="${evento.fimInscricao != null ? #temporals.format(evento.fimInscricao, 'yyyy-MM-dd') : ''}">
+                      <input type="time" class="form-control-custom"
+                             name="fimInscricaoTime" id="fimInscricaoTime"
+                             th:value="${evento.fimInscricao != null ? #temporals.format(evento.fimInscricao, 'HH:mm') : ''}">
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset style="border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin-top:8px;">
+                <legend style="font-weight:600;font-size:.875rem;color:var(--gray-500);padding:0 8px;">Período de Confirmação</legend>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                  <div class="form-group">
+                    <label>Início</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                      <input type="date" class="form-control-custom"
+                             name="inicioConfirmacaoDate" id="inicioConfirmacaoDate"
+                             th:value="${evento.inicioConfirmacao != null ? #temporals.format(evento.inicioConfirmacao, 'yyyy-MM-dd') : ''}">
+                      <input type="time" class="form-control-custom"
+                             name="inicioConfirmacaoTime" id="inicioConfirmacaoTime"
+                             th:value="${evento.inicioConfirmacao != null ? #temporals.format(evento.inicioConfirmacao, 'HH:mm') : ''}">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Fim</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                      <input type="date" class="form-control-custom"
+                             name="fimConfirmacaoDate" id="fimConfirmacaoDate"
+                             th:value="${evento.fimConfirmacao != null ? #temporals.format(evento.fimConfirmacao, 'yyyy-MM-dd') : ''}">
+                      <input type="time" class="form-control-custom"
+                             name="fimConfirmacaoTime" id="fimConfirmacaoTime"
+                             th:value="${evento.fimConfirmacao != null ? #temporals.format(evento.fimConfirmacao, 'HH:mm') : ''}">
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
             </div>
           </div>
 

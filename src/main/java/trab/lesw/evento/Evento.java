@@ -2,6 +2,7 @@ package trab.lesw.evento;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,24 @@ public class Evento implements Serializable {
 
     private Boolean publicado = false;
 
-    private Boolean concluido = false;
+    private LocalDateTime inicioInscricao;
+    private LocalDateTime fimInscricao;
+    private LocalDateTime inicioConfirmacao;
+    private LocalDateTime fimConfirmacao;
+
+    public boolean isInscricaoAberta() {
+        LocalDateTime now = LocalDateTime.now();
+        if (inicioInscricao != null && now.isBefore(inicioInscricao)) return false;
+        if (fimInscricao != null && now.isAfter(fimInscricao)) return false;
+        return true;
+    }
+
+    public boolean isConfirmacaoAberta() {
+        LocalDateTime now = LocalDateTime.now();
+        if (inicioConfirmacao != null && now.isBefore(inicioConfirmacao)) return false;
+        if (fimConfirmacao != null && now.isAfter(fimConfirmacao)) return false;
+        return true;
+    }
 
     @ManyToMany
     @JoinTable(

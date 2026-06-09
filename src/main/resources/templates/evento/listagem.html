@@ -74,22 +74,23 @@
                   th:data-id="${e.id}"
                   th:data-url-inscricao="${baseUrl + '/evento/inscricao/' + e.id}"
                   th:data-url-confirmar="${baseUrl + '/evento/confirmar/' + e.id}"
-                  th:data-concluido="${e.concluido}">
+                  th:data-inscricao-aberta="${e.inscricaoAberta}"
+                  th:data-confirmacao-aberta="${e.confirmacaoAberta}">
                 <td data-label="ID" th:text="${e.id}"></td>
                 <td data-label="Título" th:text="${e.titulo}"></td>
                 <td data-label="Data" th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}"></td>
                 <td data-label="Início" th:text="${e.horaInicio}"></td>
                 <td data-label="Status">
-                  <span th:if="${e.concluido == true}" class="badge-custom" style="background:var(--success-light);color:var(--success);">Concluído</span>
-                  <span th:unless="${e.concluido == true}" class="badge-custom" style="background:var(--info-light);color:var(--info);">Aberto</span>
+                  <span th:if="${e.inscricaoAberta or e.confirmacaoAberta}" class="badge-custom" style="background:var(--info-light);color:var(--info);">Ativo</span>
+                  <span th:unless="${e.inscricaoAberta or e.confirmacaoAberta}" class="badge-custom" style="background:var(--gray-100);color:var(--gray-400);">Fechado</span>
                 </td>
                 <td data-label="Ações">
                   <div class="actions-cell">
                     <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
-                            th:classappend="${e.concluido == true ? 'btn-disabled' : ''}"
+                            th:classappend="${!e.inscricaoAberta ? 'btn-disabled' : ''}"
                             onclick="mostrarQrCodeInscricao(this)">Inscrever-se</button>
                     <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
-                            th:classappend="${e.concluido != true ? 'btn-disabled' : ''}"
+                            th:classappend="${!e.confirmacaoAberta ? 'btn-disabled' : ''}"
                             onclick="mostrarQrCodeConfirmar(this)">Confirmar</button>
                     <a th:href="@{'/evento/participantes/' + ${e.id}}"
                        class="btn-custom btn-custom-outline btn-custom-sm">Participantes</a>
@@ -133,12 +134,8 @@
 var tipoQrAtual = '';
 
 function mostrarQrCodeInscricao(btn) {
+  if (btn.classList.contains('btn-disabled')) return;
   var row = btn.closest('tr');
-  var concluido = row.dataset.concluido === 'true';
-  if (concluido) {
-    alert('Este evento já foi concluído. Não é possível realizar inscrição.');
-    return;
-  }
   tipoQrAtual = 'inscricao';
   var url = row.dataset.urlInscricao;
   document.getElementById('qrModalTitle').textContent = 'QR Code - Inscrição';
@@ -149,12 +146,8 @@ function mostrarQrCodeInscricao(btn) {
 }
 
 function mostrarQrCodeConfirmar(btn) {
+  if (btn.classList.contains('btn-disabled')) return;
   var row = btn.closest('tr');
-  var concluido = row.dataset.concluido === 'true';
-  if (!concluido) {
-    alert('Este evento ainda não foi concluído. A confirmação só estará disponível após a conclusão.');
-    return;
-  }
   tipoQrAtual = 'confirmar';
   var url = row.dataset.urlConfirmar;
   document.getElementById('qrModalTitle').textContent = 'QR Code - Confirmar Participação';
