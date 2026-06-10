@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import trab.lesw.medalha.MedalhaService;
 import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
+import trab.lesw.email.EmailService;
 import trab.lesw.evento.Evento;
 import trab.lesw.evento.EventoRepository;
 
@@ -26,42 +27,47 @@ public class ParticipacaoService {
 	@Autowired
 	private MedalhaService medalhaService;
 
+	@Autowired
+	private EmailService emailService;
+
 	public String inscrever(Long usuarioId, Long eventoId) {
-	    if (Boolean.TRUE.equals(repository.existeParticipacaoProcedure(usuarioId, eventoId))) {
-	        return "Usuário já está inscrito nesse evento!";
-	    }
-	    Evento evento = eventoRepository.getReferenceById(eventoId);
-	    Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
-	    Participacao p = new Participacao();
-	    p.setUsuario(usuario);
-	    p.setEvento(evento);
-	    p.setPontosGanhos(0);
-	    p.setConfirmado(false);
-	    repository.save(p);
-	    return "Inscrição realizada com sucesso!";
+		if (Boolean.TRUE.equals(repository.existeParticipacaoProcedure(usuarioId, eventoId))) {
+			return "Usuário já está inscrito nesse evento!";
+		}
+		Evento evento = eventoRepository.getReferenceById(eventoId);
+		Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
+		Participacao p = new Participacao();
+		p.setUsuario(usuario);
+		p.setEvento(evento);
+		p.setPontosGanhos(0);
+		p.setConfirmado(false);
+		repository.save(p);
+		emailService.enviarEmail(usuario.getEmail(), "Inscrição realizada com sucesso!",
+				"Sua inscrição no evento " + evento.getTitulo() + " foi realizada com sucesso!");
+		return "Inscrição realizada com sucesso!";
 	}
 
 	public String participar(Long usuarioId, Long eventoId) {
-	    if (!Boolean.TRUE.equals(repository.existeParticipacaoProcedure(usuarioId, eventoId))) {
-	        return "Usuário não está inscrito nesse evento!";
-	    }
-	    if (Boolean.TRUE.equals(repository.existeParticipacaoConfirmadaProcedure(usuarioId, eventoId, true))) {
-	        return "Usuário já confirmou participação nesse evento!";
-	    }
-	    Evento evento = eventoRepository.getReferenceById(eventoId);
-	    Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
+		if (!Boolean.TRUE.equals(repository.existeParticipacaoProcedure(usuarioId, eventoId))) {
+			return "Usuário não está inscrito nesse evento!";
+		}
+		if (Boolean.TRUE.equals(repository.existeParticipacaoConfirmadaProcedure(usuarioId, eventoId, true))) {
+			return "Usuário já confirmou participação nesse evento!";
+		}
+		Evento evento = eventoRepository.getReferenceById(eventoId);
+		Usuario usuario = usuarioRepository.getReferenceById(usuarioId);
 
-	    Participacao p = repository.findByUsuarioIdAndEventoId(usuarioId, eventoId);
-	    p.setConfirmado(true);
-	    p.setPontosGanhos(evento.getPontos());
-	    repository.save(p);
+		Participacao p = repository.findByUsuarioIdAndEventoId(usuarioId, eventoId);
+		p.setConfirmado(true);
+		p.setPontosGanhos(evento.getPontos());
+		repository.save(p);
 
-	    medalhaService.awardMedal(usuario, evento);
+		medalhaService.awardMedal(usuario, evento);
 
-	    Integer total = repository.calcularPontosUsuarioProcedure(usuario.getId());
-	    medalhaService.awardMedalByPoints(usuario, total != null ? total : 0);
+		Integer total = repository.calcularPontosUsuarioProcedure(usuario.getId());
+		medalhaService.awardMedalByPoints(usuario, total != null ? total : 0);
 
-	    return "Participação confirmada!";
+		return "Participação confirmada!";
 	}
 
 	public List<Participacao> getAll() {
@@ -72,8 +78,8 @@ public class ParticipacaoService {
 		Integer total = repository.calcularPontosUsuarioProcedure(usuarioId);
 		return total != null ? total : 0;
 	}
-	
-	public List<Participacao> participacoes(Long eventoId){
+
+	public List<Participacao> participacoes(Long eventoId) {
 		return repository.findByEventoIdWithUsuario(eventoId);
 	}
 }

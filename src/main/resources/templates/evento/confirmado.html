@@ -50,6 +50,7 @@
         <div style="margin:16px 0 24px;">
           <h5 th:text="${evento.titulo}" style="margin:0 0 4px;color:var(--gray-900);"></h5>
           <p style="color:var(--gray-500);font-size:.875rem;margin:0;" th:text="'Participação confirmada para ' + ${usuario.nome}"></p>
+          <p style="color:var(--gray-500);font-size:.875rem;margin:0;" th:text="Uma cópia do certificado foi enviada ao seu email!"></p>
         </div>
 
         <a th:href="${downloadUrl}" class="btn-custom btn-custom-success btn-custom-lg" style="margin-bottom:12px;">Baixar Certificado</a>
