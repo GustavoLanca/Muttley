@@ -30,6 +30,7 @@ import trab.lesw.certificado.Certificado;
 import trab.lesw.certificado.CertificadoRepository;
 import trab.lesw.certificado.CertificadoService;
 import trab.lesw.disciplina.DisciplinaRepository;
+import trab.lesw.email.EmailService;
 import trab.lesw.linkedin.LinkedInService;
 import trab.lesw.participacao.Participacao;
 import trab.lesw.participacao.ParticipacaoRepository;
@@ -46,9 +47,12 @@ public class EventoController {
 
 	@Autowired
 	private EventoService service;
-	
+
 	@Autowired
 	private TagRepository tagRepository;
+
+	@Autowired
+	private EmailService emailService;
 
 	@Autowired
 	private DisciplinaRepository disciplinaRepository;
@@ -97,47 +101,54 @@ public class EventoController {
 
 	@GetMapping("/formulario")
 	public String novo(Model model) {
-	    model.addAttribute("evento", new Evento());
-	    model.addAttribute("tags", tagRepository.findAll());
-	    model.addAttribute("disciplinas", disciplinaRepository.findAll());
-	    model.addAttribute("organizadores", usuarioRepository.findAll());
-	    model.addAttribute("palestrantes", usuarioRepository.findAll());
-	    model.addAttribute("professores", usuarioRepository.findAll());
-	    return "evento/formulario";
+		model.addAttribute("evento", new Evento());
+		model.addAttribute("tags", tagRepository.findAll());
+		model.addAttribute("disciplinas", disciplinaRepository.findAll());
+		model.addAttribute("organizadores", usuarioRepository.findAll());
+		model.addAttribute("palestrantes", usuarioRepository.findAll());
+		model.addAttribute("professores", usuarioRepository.findAll());
+		return "evento/formulario";
 	}
+
 	@PostMapping("/salvar")
-	public String salvar(@ModelAttribute Evento evento,
-						 @RequestParam(required = false) List<Long> tags,
-						 @RequestParam(required = false) List<Long> organizadores,
-						 @RequestParam(required = false) List<Long> palestrantes,
-						 @RequestParam(required = false) List<Long> professores,
-						 @RequestParam(required = false) MultipartFile imagemFile,
-						 @RequestParam(required = false) String inicioInscricaoDate,
-						 @RequestParam(required = false) String inicioInscricaoTime,
-						 @RequestParam(required = false) String fimInscricaoDate,
-						 @RequestParam(required = false) String fimInscricaoTime,
-						 @RequestParam(required = false) String inicioConfirmacaoDate,
-						 @RequestParam(required = false) String inicioConfirmacaoTime,
-						 @RequestParam(required = false) String fimConfirmacaoDate,
-						 @RequestParam(required = false) String fimConfirmacaoTime,
-						 RedirectAttributes attr) {
-		if (inicioInscricaoDate != null && inicioInscricaoTime != null && !inicioInscricaoDate.isEmpty() && !inicioInscricaoTime.isEmpty()) {
-			evento.setInicioInscricao(LocalDateTime.of(LocalDate.parse(inicioInscricaoDate), LocalTime.parse(inicioInscricaoTime)));
+	public String salvar(@ModelAttribute Evento evento, @RequestParam(required = false) List<Long> tags,
+			@RequestParam(required = false) List<Long> organizadores,
+			@RequestParam(required = false) List<Long> palestrantes,
+			@RequestParam(required = false) List<Long> professores,
+			@RequestParam(required = false) MultipartFile imagemFile,
+			@RequestParam(required = false) String inicioInscricaoDate,
+			@RequestParam(required = false) String inicioInscricaoTime,
+			@RequestParam(required = false) String fimInscricaoDate,
+			@RequestParam(required = false) String fimInscricaoTime,
+			@RequestParam(required = false) String inicioConfirmacaoDate,
+			@RequestParam(required = false) String inicioConfirmacaoTime,
+			@RequestParam(required = false) String fimConfirmacaoDate,
+			@RequestParam(required = false) String fimConfirmacaoTime, RedirectAttributes attr) {
+		if (inicioInscricaoDate != null && inicioInscricaoTime != null && !inicioInscricaoDate.isEmpty()
+				&& !inicioInscricaoTime.isEmpty()) {
+			evento.setInicioInscricao(
+					LocalDateTime.of(LocalDate.parse(inicioInscricaoDate), LocalTime.parse(inicioInscricaoTime)));
 		} else {
 			evento.setInicioInscricao(null);
 		}
-		if (fimInscricaoDate != null && fimInscricaoTime != null && !fimInscricaoDate.isEmpty() && !fimInscricaoTime.isEmpty()) {
-			evento.setFimInscricao(LocalDateTime.of(LocalDate.parse(fimInscricaoDate), LocalTime.parse(fimInscricaoTime)));
+		if (fimInscricaoDate != null && fimInscricaoTime != null && !fimInscricaoDate.isEmpty()
+				&& !fimInscricaoTime.isEmpty()) {
+			evento.setFimInscricao(
+					LocalDateTime.of(LocalDate.parse(fimInscricaoDate), LocalTime.parse(fimInscricaoTime)));
 		} else {
 			evento.setFimInscricao(null);
 		}
-		if (inicioConfirmacaoDate != null && inicioConfirmacaoTime != null && !inicioConfirmacaoDate.isEmpty() && !inicioConfirmacaoTime.isEmpty()) {
-			evento.setInicioConfirmacao(LocalDateTime.of(LocalDate.parse(inicioConfirmacaoDate), LocalTime.parse(inicioConfirmacaoTime)));
+		if (inicioConfirmacaoDate != null && inicioConfirmacaoTime != null && !inicioConfirmacaoDate.isEmpty()
+				&& !inicioConfirmacaoTime.isEmpty()) {
+			evento.setInicioConfirmacao(
+					LocalDateTime.of(LocalDate.parse(inicioConfirmacaoDate), LocalTime.parse(inicioConfirmacaoTime)));
 		} else {
 			evento.setInicioConfirmacao(null);
 		}
-		if (fimConfirmacaoDate != null && fimConfirmacaoTime != null && !fimConfirmacaoDate.isEmpty() && !fimConfirmacaoTime.isEmpty()) {
-			evento.setFimConfirmacao(LocalDateTime.of(LocalDate.parse(fimConfirmacaoDate), LocalTime.parse(fimConfirmacaoTime)));
+		if (fimConfirmacaoDate != null && fimConfirmacaoTime != null && !fimConfirmacaoDate.isEmpty()
+				&& !fimConfirmacaoTime.isEmpty()) {
+			evento.setFimConfirmacao(
+					LocalDateTime.of(LocalDate.parse(fimConfirmacaoDate), LocalTime.parse(fimConfirmacaoTime)));
 		} else {
 			evento.setFimConfirmacao(null);
 		}
@@ -167,20 +178,21 @@ public class EventoController {
 
 	@GetMapping("/formulario/{id}")
 	public String editar(@PathVariable Long id, Model model) {
-	    model.addAttribute("evento", service.getById(id));
-	    model.addAttribute("tags", tagRepository.findAll());
-	    model.addAttribute("disciplinas", disciplinaRepository.findAll());
-	    model.addAttribute("organizadores", usuarioRepository.findAll());
-	    model.addAttribute("palestrantes", usuarioRepository.findAll());
-	    model.addAttribute("professores", usuarioRepository.findAll());
-	    return "evento/formulario";
+		model.addAttribute("evento", service.getById(id));
+		model.addAttribute("tags", tagRepository.findAll());
+		model.addAttribute("disciplinas", disciplinaRepository.findAll());
+		model.addAttribute("organizadores", usuarioRepository.findAll());
+		model.addAttribute("palestrantes", usuarioRepository.findAll());
+		model.addAttribute("professores", usuarioRepository.findAll());
+		return "evento/formulario";
 	}
 
 	@GetMapping("/inscricao/{id}")
 	public String inscricaoForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
 		Evento evento = service.getById(id);
 		if (!evento.isInscricaoAberta()) {
-			attr.addFlashAttribute("erro", "Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
+			attr.addFlashAttribute("erro",
+					"Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
 			return "redirect:/evento";
 		}
 		model.addAttribute("evento", evento);
@@ -188,13 +200,12 @@ public class EventoController {
 	}
 
 	@PostMapping("/inscricao/{id}")
-	public String inscrever(@PathVariable Long id,
-							@RequestParam String cpf,
-							RedirectAttributes attr) {
+	public String inscrever(@PathVariable Long id, @RequestParam String cpf, RedirectAttributes attr) {
 		Evento evento = service.getById(id);
 
 		if (!evento.isInscricaoAberta()) {
-			attr.addFlashAttribute("erro", "Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
+			attr.addFlashAttribute("erro",
+					"Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
 			return "redirect:/evento/inscricao/" + id;
 		}
 
@@ -220,7 +231,8 @@ public class EventoController {
 	public String confirmarForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
 		Evento evento = service.getById(id);
 		if (!evento.isConfirmacaoAberta()) {
-			attr.addFlashAttribute("erro", "Confirmação fechada no momento. Verifique o período de confirmação do evento.");
+			attr.addFlashAttribute("erro",
+					"Confirmação fechada no momento. Verifique o período de confirmação do evento.");
 			return "redirect:/evento";
 		}
 		model.addAttribute("evento", evento);
@@ -228,13 +240,12 @@ public class EventoController {
 	}
 
 	@PostMapping("/confirmar/{id}")
-	public String confirmar(@PathVariable Long id,
-							@RequestParam String cpf,
-							RedirectAttributes attr) {
+	public String confirmar(@PathVariable Long id, @RequestParam String cpf, RedirectAttributes attr) {
 		Evento evento = service.getById(id);
 
 		if (!evento.isConfirmacaoAberta()) {
-			attr.addFlashAttribute("erro", "Confirmação fechada no momento. Verifique o período de confirmação do evento.");
+			attr.addFlashAttribute("erro",
+					"Confirmação fechada no momento. Verifique o período de confirmação do evento.");
 			return "redirect:/evento/confirmar/" + id;
 		}
 
@@ -261,7 +272,8 @@ public class EventoController {
 				byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
 				if (pdfBytes.length > 0) {
 					String projectDir = System.getProperty("user.dir");
-					Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
+					Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads",
+							"certificados");
 					Files.createDirectories(uploadPath);
 					String nomeArquivo = usuario.getId() + "_" + id + ".pdf";
 					Path destino = uploadPath.resolve(nomeArquivo);
@@ -273,6 +285,10 @@ public class EventoController {
 					cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
 					cert.setDataEmissao(LocalDateTime.now());
 					certificadoRepository.save(cert);
+					emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
+							"Sua presença no evento " + evento.getTitulo() + " foi confirmada com sucesso. \n "
+									+ "Segue em anexo o seu certificado do evento.",
+							pdfBytes, "certificado.pdf"); 
 				}
 			} catch (Exception e) {
 				log.error("Erro ao gerar certificado automático", e);
@@ -309,7 +325,8 @@ public class EventoController {
 
 			if (Boolean.FALSE.equals(certificadoRepository.existeCertificadoProcedure(usuarioId, eventoId))) {
 				String projectDir = System.getProperty("user.dir");
-				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
+				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads",
+						"certificados");
 				Files.createDirectories(uploadPath);
 				String nomeArquivo = usuarioId + "_" + eventoId + ".pdf";
 				Path destino = uploadPath.resolve(nomeArquivo);
@@ -325,10 +342,8 @@ public class EventoController {
 
 			ByteArrayInputStream in = new ByteArrayInputStream(pdfBytes);
 			InputStreamResource resource = new InputStreamResource(in);
-			return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=certificado.pdf")
-				.contentType(MediaType.APPLICATION_PDF)
-				.body(resource);
+			return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=certificado.pdf")
+					.contentType(MediaType.APPLICATION_PDF).body(resource);
 		} catch (Exception e) {
 			return ResponseEntity.internalServerError().build();
 		}
