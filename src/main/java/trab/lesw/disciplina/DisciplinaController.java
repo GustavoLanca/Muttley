@@ -32,7 +32,7 @@ public class DisciplinaController {
     @GetMapping("/formulario")
     public String novo(Model model) {
         model.addAttribute("disciplina", new Disciplina());
-        model.addAttribute("professores", usuarioRepository.findAll());
+        model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
         model.addAttribute("cursos", cursoRepository.findAll());
         return "disciplina/formulario";
     }
@@ -40,7 +40,7 @@ public class DisciplinaController {
     @GetMapping("/formulario/{id}")
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("disciplina", service.getById(id));
-        model.addAttribute("professores", usuarioRepository.findAll());
+        model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
         model.addAttribute("cursos", cursoRepository.findAll());
         return "disciplina/formulario";
     }
