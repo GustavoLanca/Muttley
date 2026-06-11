@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="'Muttley - ' + ${evento.titulo}"></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/muttley.css}">
+</head>
+<body>
+
+<nav class="navbar-muttley">
+  <div class="navbar-inner">
+    <a th:href="@{/user/evento}" class="navbar-brand">
+      <img th:src="@{/muttleyR.png}" alt="Muttley">
+      Muttley 
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="navbar-links">
+      <a th:href="@{/user/evento}">Eventos Disponíveis</a>
+      <a th:href="@{/user/evento/participacoes}">Minhas Participações</a>
+      <a th:href="@{/user/evento/medalhas}">Minhas Medalhas</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container-page" style="max-width:640px;">
+    <div class="page-header">
+      <h1 class="page-title" th:text="${evento.titulo}"></h1>
+    </div>
+
+    <div class="card-custom">
+      <div class="card-custom-body">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <div th:if="${evento.imagemUrl}" style="text-align:center;">
+            <img th:src="@{${evento.imagemUrl}}" alt="Imagem do evento" style="max-width:100%;border-radius:8px;max-height:240px;">
+          </div>
+
+          <div th:if="${evento.descricao}">
+            <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Descrição</h3>
+            <p style="margin:0;color:var(--gray-700);" th:text="${evento.descricao}"></p>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Data</h3>
+              <p style="margin:0;font-weight:600;" th:text="${#temporals.format(evento.data, 'dd/MM/yyyy')}"></p>
+            </div>
+            <div>
+              <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Horário</h3>
+              <p style="margin:0;font-weight:600;" th:text="${evento.horaInicio + ' - ' + evento.horaFim}"></p>
+            </div>
+            <div th:if="${evento.tipo}">
+              <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Tipo</h3>
+              <p style="margin:0;font-weight:600;" th:text="${evento.tipo}"></p>
+            </div>
+            <div th:if="${evento.disciplina}">
+              <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Disciplina</h3>
+              <p style="margin:0;font-weight:600;" th:text="${evento.disciplina.nome}"></p>
+            </div>
+            <div>
+              <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Pontos</h3>
+              <p style="margin:0;font-weight:600;" th:text="${evento.pontos}"></p>
+            </div>
+            <div>
+              <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Status</h3>
+              <p style="margin:0;font-weight:600;">
+                <span th:if="${evento.inscricaoAberta}" class="badge-custom" style="background:var(--success-light);color:var(--success);">Inscrições Abertas</span>
+                <span th:unless="${evento.inscricaoAberta}" class="badge-custom" style="background:var(--gray-100);color:var(--gray-400);">Encerrado</span>
+              </p>
+            </div>
+          </div>
+
+          <div th:if="${not #lists.isEmpty(evento.tags)}">
+            <h3 style="margin:0 0 4px 0;font-size:.875rem;color:var(--gray-500);">Tags</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span th:each="tag : ${evento.tags}" class="badge-custom" style="background:var(--info-light);color:var(--info);" th:text="${tag.nome}"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;text-align:center;">
+      <a th:href="@{/user/evento}" class="btn-custom btn-custom-outline">Voltar para Eventos</a>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

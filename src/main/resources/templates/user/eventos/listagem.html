@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Muttley - Eventos Disponíveis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/muttley.css}">
+</head>
+<body>
+
+<nav class="navbar-muttley">
+  <div class="navbar-inner">
+    <a th:href="@{/user/evento}" class="navbar-brand">
+      <img th:src="@{/muttleyR.png}" alt="Muttley">
+      Muttley 
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+		<div class="navbar-links">
+		  <a th:href="@{/user/evento}">Eventos Disponíveis</a>
+		  <a th:href="@{/user/evento/participacoes}">Minhas Participações</a>
+		  <a th:href="@{/user/evento/medalhas}">Minhas Medalhas</a>
+		</div>
+  </div>
+</nav>
+
+<main>
+  <div class="container-page">
+    <div class="page-header">
+      <h1 class="page-title">Eventos Disponíveis</h1>
+    </div>
+
+    <th:block th:if="${#lists.isEmpty(eventos)}">
+      <div class="card-custom">
+        <div class="card-custom-body">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <p>Nenhum evento disponível no momento.</p>
+          </div>
+        </div>
+      </div>
+    </th:block>
+
+    <th:block th:unless="${#lists.isEmpty(eventos)}">
+      <div class="card-custom">
+        <div class="card-custom-body" style="padding:0;">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Data</th>
+                <th>Início</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="e : ${eventos}"
+                  th:data-id="${e.id}"
+                  th:data-url-inscricao="${baseUrl + '/user/evento/inscricao/' + e.id}"
+                  th:data-url-confirmar="${baseUrl + '/evento/confirmar/' + e.id}"
+                  th:data-inscricao-aberta="${e.inscricaoAberta}"
+                  th:data-confirmacao-aberta="${e.confirmacaoAberta}">
+                <td data-label="Título" th:text="${e.titulo}"></td>
+                <td data-label="Data" th:text="${#temporals.format(e.data, 'dd/MM/yyyy')}"></td>
+                <td data-label="Início" th:text="${e.horaInicio}"></td>
+                <td data-label="Status">
+                  <span th:if="${e.inscricaoAberta}" class="badge-custom" style="background:var(--success-light);color:var(--success);">Inscrições Abertas</span>
+                  <span th:unless="${e.inscricaoAberta}" class="badge-custom" style="background:var(--gray-100);color:var(--gray-400);">Encerrado</span>
+                </td>
+                <td data-label="Ações">
+                  <div class="actions-cell">
+                    <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
+                            th:classappend="${!e.inscricaoAberta ? 'btn-disabled' : ''}"
+                            onclick="mostrarQrCodeInscricao(this)">Inscrever-se</button>
+                    <button type="button" class="btn-custom btn-custom-outline btn-custom-sm"
+                            th:classappend="${!e.confirmacaoAberta ? 'btn-disabled' : ''}"
+                            onclick="mostrarQrCodeConfirmar(this)">Confirmar</button>
+                    <a th:href="@{'/user/evento/detalhes/' + ${e.id}}"
+                       class="btn-custom btn-custom-outline btn-custom-sm">Detalhes</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </th:block>
+
+    <div style="margin-top:16px;">
+      <a th:href="@{/user/evento}" class="btn-custom btn-custom-outline">Atualizar Página</a>
+    </div>
+  </div>
+</main>
+
+<div class="qr-modal-backdrop" id="qrModalBackdrop"></div>
+<div class="qr-modal" id="qrCodeModal">
+  <div class="qr-modal-header">
+    <h5 id="qrModalTitle">QR Code do Evento</h5>
+    <button type="button" class="qr-modal-close" onclick="fecharQrCode()">&times;</button>
+  </div>
+  <div class="qr-modal-body">
+    <img id="qrCodeImage" src="" alt="QR Code">
+    <p id="qrCodeUrl"></p>
+  </div>
+  <div class="qr-modal-footer">
+    <button type="button" class="btn-custom btn-custom-outline btn-custom-sm" onclick="fecharQrCode()">Fechar</button>
+  </div>
+</div>
+
+<script>
+function mostrarQrCodeInscricao(btn) {
+  if (btn.classList.contains('btn-disabled')) return;
+  var row = btn.closest('tr');
+  var url = row.dataset.urlInscricao;
+  document.getElementById('qrModalTitle').textContent = 'QR Code - Inscrição';
+  document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
+  document.getElementById('qrCodeUrl').textContent = url;
+  document.getElementById('qrCodeModal').classList.add('show');
+  document.getElementById('qrModalBackdrop').classList.add('show');
+}
+
+function mostrarQrCodeConfirmar(btn) {
+  if (btn.classList.contains('btn-disabled')) return;
+  var row = btn.closest('tr');
+  var url = row.dataset.urlConfirmar;
+  document.getElementById('qrModalTitle').textContent = 'QR Code - Confirmar Participação';
+  document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
+  document.getElementById('qrCodeUrl').textContent = url;
+  document.getElementById('qrCodeModal').classList.add('show');
+  document.getElementById('qrModalBackdrop').classList.add('show');
+}
+
+function fecharQrCode() {
+  document.getElementById('qrCodeModal').classList.remove('show');
+  document.getElementById('qrModalBackdrop').classList.remove('show');
+}
+</script>
+
+</body>
+</html>
