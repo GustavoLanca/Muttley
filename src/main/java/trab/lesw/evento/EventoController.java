@@ -107,7 +107,7 @@ public class EventoController {
 		model.addAttribute("disciplinas", disciplinaRepository.findAll());
 		model.addAttribute("organizadores", usuarioRepository.findAll());
 		model.addAttribute("palestrantes", usuarioRepository.findAll());
-		model.addAttribute("professores", usuarioRepository.findAll());
+		model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
 		return "evento/formulario";
 	}
 
@@ -184,7 +184,7 @@ public class EventoController {
 		model.addAttribute("disciplinas", disciplinaRepository.findAll());
 		model.addAttribute("organizadores", usuarioRepository.findAll());
 		model.addAttribute("palestrantes", usuarioRepository.findAll());
-		model.addAttribute("professores", usuarioRepository.findAll());
+		model.addAttribute("professores", usuarioRepository.findByTipo("PROFESSOR"));
 		return "evento/formulario";
 	}
 
