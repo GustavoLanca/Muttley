@@ -316,6 +316,22 @@ public class UsuarioEventoController {
         return "redirect:/user/evento/certificado";
     }
 
+    @GetMapping("/certificado/validar")
+    public String validarCertificadoForm(Model model) {
+        return "user/eventos/validar-certificado";
+    }
+
+    @PostMapping("/certificado/validar")
+    public String validarCertificado(@RequestParam String hash, RedirectAttributes attr) {
+        Optional<Certificado> opt = certificadoRepository.findByHash(hash);
+        if (opt.isEmpty()) {
+            attr.addFlashAttribute("erro", "Hash inválido! Nenhum certificado encontrado com esse hash.");
+            return "redirect:/user/evento/certificado/validar";
+        }
+        Certificado cert = opt.get();
+        return "redirect:/evento/certificado/" + cert.getEvento().getId() + "/" + cert.getUsuario().getId();
+    }
+
     @GetMapping("/cadastro")
     public String cadastroForm(Model model) {
         model.addAttribute("usuario", new Usuario());
