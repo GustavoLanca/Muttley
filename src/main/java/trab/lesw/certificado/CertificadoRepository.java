@@ -23,4 +23,6 @@ public interface CertificadoRepository extends JpaRepository<Certificado, Long> 
 
     @Procedure(procedureName = "sp_existe_certificado")
     Boolean existeCertificadoProcedure(@Param("p_usuario_id") Long usuarioId, @Param("p_evento_id") Long eventoId);
+
+    Optional<Certificado> findByHash(String hash);
 }
