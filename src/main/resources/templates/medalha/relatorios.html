@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Muttley - Relatórios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/muttley.css}">
+  <style>
+    .relatorio-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--muttley-white); border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 8px; transition: var(--transition); }
+    .relatorio-item:hover { border-color: var(--muttley-orange); }
+    .relatorio-item .info { display: flex; flex-direction: column; gap: 2px; }
+    .relatorio-item .nome { font-weight: 600; font-size: 0.9rem; color: var(--gray-800); }
+    .relatorio-item .meta { font-size: 0.75rem; color: var(--gray-400); }
+    .btn-download { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; border: none; background: var(--muttley-orange); color: #fff; cursor: pointer; text-decoration: none; transition: var(--transition); }
+    .btn-download:hover { background: #e65c00; }
+    .btn-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; border: 2px solid var(--gray-300); background: var(--muttley-white); cursor: pointer; transition: var(--transition); color: var(--gray-600); box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-decoration:none; }
+    .btn-toggle:hover { background: var(--gray-100); border-color: var(--gray-400); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar-muttley">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-brand">
+      <img th:src="@{/muttleyR.png}" alt="Muttley">
+      Muttley
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="navbar-links">
+      <a th:href="@{/}">Início</a>
+      <a th:href="@{/evento}">Eventos</a>
+      <a th:href="@{/usuario}">Usuários</a>
+      <a th:href="@{/curso}">Cursos</a>
+      <a th:href="@{/disciplina}">Disciplinas</a>
+      <a th:href="@{/tag}">Tags</a>
+      <a th:href="@{/medalha/ranking}" class="active">Medalhas</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container-page">
+    <div class="page-header">
+      <h1 class="page-title">Relatórios de Entrega</h1>
+      <a th:href="@{/medalha/ranking}" class="btn-custom" style="background:var(--gray-100);color:var(--gray-700);">
+        &larr; Voltar ao ranking
+      </a>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <form method="GET" th:action="@{/medalha/relatorios}" style="display:flex;align-items:center;gap:8px;">
+        <input type="date" name="data" th:value="${dataSelecionada}"
+               style="padding:6px 14px;border:2px solid var(--gray-300);border-radius:999px;font-size:0.85rem;font-family:inherit;background:var(--muttley-white);">
+        <button type="submit" class="btn-toggle" style="border:2px solid var(--gray-300);padding:6px 16px;">Filtrar</button>
+        <a th:href="@{/medalha/relatorios}" th:if="${dataSelecionada != null and !dataSelecionada.isEmpty()}"
+           class="btn-toggle" style="border:2px solid var(--gray-300);padding:6px 16px;text-decoration:none;color:var(--gray-600);">Limpar</a>
+      </form>
+    </div>
+
+    <th:block th:if="${#lists.isEmpty(arquivos)}">
+      <div class="card-custom">
+        <div class="card-custom-body">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-300);">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <p th:if="${dataSelecionada != null and !dataSelecionada.isEmpty()}">Nenhum relatório encontrado para esta data.</p>
+            <p th:unless="${dataSelecionada != null and !dataSelecionada.isEmpty()}">Nenhum relatório gerado ainda.</p>
+          </div>
+        </div>
+      </div>
+    </th:block>
+
+    <th:block th:if="${not #lists.isEmpty(arquivos)}">
+      <div class="card-custom">
+        <div class="card-custom-body">
+          <div class="relatorio-item" th:each="arq : ${arquivos}">
+            <div class="info">
+              <span class="nome" th:text="${arq.nome}"></span>
+              <span class="meta" th:text="${#dates.format(arq.data, 'dd/MM/yyyy HH:mm')} + ' — ' + ${#strings.isEmpty('' + arq.tamanho) ? '' : #numbers.formatDecimal(arq.tamanho / 1024, 0, 1) + ' KB'}"></span>
+            </div>
+            <a class="btn-download" th:href="@{/medalha/relatorios/{nome}(nome=${arq.nome})}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar
+            </a>
+          </div>
+        </div>
+      </div>
+    </th:block>
+  </div>
+</main>
+
+</body>
+</html>

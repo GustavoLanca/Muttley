@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Muttley - Ranking de Medalhas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/muttley.css}">
+  <style>
+    .ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+    .ranking-table th { text-align: left; padding: 8px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-400); font-weight: 600; }
+    .ranking-table td { padding: 12px; background: var(--muttley-white); border-bottom: 1px solid var(--gray-100); }
+    .ranking-table tr td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+    .ranking-table tr td:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+    .pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; font-weight: 700; font-size: 0.875rem; }
+    .pos-1 { background: #fef3c7; color: #d97706; }
+    .pos-2 { background: #f1f5f9; color: #64748b; }
+    .pos-3 { background: #fed7aa; color: #c2410c; }
+    .pos-rest { background: var(--gray-100); color: var(--gray-500); }
+    .medal-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; background: var(--gray-100); color: var(--gray-700); margin: 2px; }
+    .medal-tag.entregue { background: var(--success-light); color: var(--success); }
+    .medalha-label input[type="checkbox"]:checked + .medal-tag { background: #dbeafe; color: #2563eb; }
+    .medalha-label { cursor: pointer; margin: 2px; display: inline-flex; }
+    .btn-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; border: 2px solid var(--gray-300); background: var(--muttley-white); cursor: pointer; transition: var(--transition); color: var(--gray-600); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .btn-toggle:hover { background: var(--gray-100); border-color: var(--gray-400); }
+    .btn-entregar { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; border: none; background: #2563eb; color: #fff; cursor: pointer; transition: var(--transition); }
+    .btn-entregar:hover { background: #1d4ed8; }
+    .pontos-cell { font-weight: 700; font-size: 1.125rem; color: var(--muttley-orange); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar-muttley">
+  <div class="navbar-inner">
+    <a th:href="@{/}" class="navbar-brand">
+      <img th:src="@{/muttleyR.png}" alt="Muttley">
+      Muttley
+    </a>
+    <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="navbar-links">
+      <a th:href="@{/}">Início</a>
+      <a th:href="@{/evento}">Eventos</a>
+      <a th:href="@{/usuario}">Usuários</a>
+      <a th:href="@{/curso}">Cursos</a>
+      <a th:href="@{/disciplina}">Disciplinas</a>
+      <a th:href="@{/tag}">Tags</a>
+      <a th:href="@{/medalha/ranking}" class="active">Medalhas</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container-page">
+    <div class="page-header">
+      <h1 class="page-title">Ranking de Medalhas</h1>
+      <a th:href="@{/medalha/relatorios}" class="btn-custom" style="background:var(--muttley-orange);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:10px 24px;border-radius:999px;font-weight:600;font-size:0.85rem;box-shadow:0 2px 8px rgba(242,109,33,0.3);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Relatórios
+      </a>
+    </div>
+
+    <div th:if="${message}" class="badge-custom" style="background:#dcfce7;color:#16a34a;padding:12px 16px;border-radius:6px;margin-bottom:20px;display:inline-block;font-weight:500;">
+      <span th:text="${message}"></span>
+    </div>
+
+    <div class="card-custom">
+      <div class="card-custom-body" style="overflow-x:auto;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <a th:href="@{/medalha/ranking(apenasPendentes=${!apenasPendentes})}"
+               class="btn-toggle"
+               th:styleappend="${apenasPendentes} ? 'background:#fef3c7;color:#d97706;border-color:#fcd34d;' : ''">
+              <th:block th:if="${apenasPendentes}">Mostrar todas</th:block>
+              <th:block th:unless="${apenasPendentes}">Só pendentes</th:block>
+            </a>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+              <button type="button" class="btn-toggle" onclick="selecionarTodas()"
+                      style="border:2px solid var(--gray-300);padding:6px 16px;cursor:pointer;">
+                Selecionar todas
+              </button>
+              <button type="button" class="btn-toggle" onclick="deselecionarTodas()"
+                      style="border:2px solid var(--gray-300);padding:6px 16px;cursor:pointer;">
+                Desmarcar todas
+              </button>
+              <button type="submit" class="btn-entregar" form="form-medalhas">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Entregar selecionadas
+              </button>
+            </div>
+        </div>
+
+        <form th:action="@{/medalha/entregar(apenasPendentes=${apenasPendentes})}" method="POST" id="form-medalhas">
+
+        <th:block th:if="${#lists.isEmpty(ranking)}">
+          <div class="empty-state" style="margin-top:16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muttley-gold);">
+              <circle cx="12" cy="8" r="7"/>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+            </svg>
+            <p th:if="${apenasPendentes}">Nenhuma medalha pendente encontrada.</p>
+            <p th:unless="${apenasPendentes}">Nenhuma medalha registrada ainda.</p>
+          </div>
+        </th:block>
+
+        <th:block th:if="${not #lists.isEmpty(ranking)}">
+
+            <table class="ranking-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Usuário</th>
+                  <th>Pontos</th>
+                  <th>Medalhas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="entry, stat : ${ranking}">
+                  <td>
+                    <span class="pos-badge"
+                          th:classappend="${stat.index == 0} ? 'pos-1' : (${stat.index == 1} ? 'pos-2' : (${stat.index == 2} ? 'pos-3' : 'pos-rest'))"
+                          th:text="${stat.index + 1}"></span>
+                  </td>
+                  <td>
+                    <div style="font-weight:600;" th:text="${entry.usuario.nome}"></div>
+                    <div style="font-size:0.75rem;color:var(--gray-400);" th:text="${entry.usuario.cpf}"></div>
+                  </td>
+                  <td class="pontos-cell" th:text="${entry.totalPontos}"></td>
+                  <td>
+                    <span style="font-weight:600;font-size:0.875rem;color:var(--gray-500);margin-right:8px;" th:text="${entry.qtdMedalhas} + ' medalha(s)'"></span>
+                    <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:4px;">
+                      <th:block th:each="medalha : ${entry.medalhas}"
+                                th:unless="${apenasPendentes and medalha.entregue}">
+                        <label th:if="${!medalha.entregue}" class="medalha-label">
+                          <input type="checkbox" name="medalhaIds" th:value="${medalha.id}" style="display:none">
+                          <span class="medal-tag" th:text="${medalha.nome}"></span>
+                        </label>
+                        <button th:if="${medalha.entregue}"
+                                type="button"
+                                class="medal-tag entregue btn-reverter"
+                                th:attr="data-nome=${medalha.nome}, data-id=${medalha.id}"
+                                th:text="${medalha.nome}"
+                                style="cursor:pointer;border:none;font:inherit;margin:2px;"></button>
+                      </th:block>
+                    </div>
+                  </td>
+                </tr>
+            </tbody>
+          </table>
+
+          </form>
+
+        </th:block>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script th:inline="javascript">
+document.querySelectorAll('.btn-reverter').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var nome = btn.getAttribute('data-nome');
+    var id = btn.getAttribute('data-id');
+    if (confirm('Tem certeza que deseja remover a entrega da medalha "' + nome + '"?')) {
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/medalha/reverter/' + id + '?apenasPendentes=' + (/*[[${apenasPendentes}]]*/ false ? 'true' : 'false');
+      form.style.display = 'none';
+      document.body.appendChild(form);
+      form.submit();
+    }
+  });
+});
+
+function selecionarTodas() {
+  document.querySelectorAll('#form-medalhas input[name="medalhaIds"]').forEach(function(cb) {
+    cb.checked = true;
+  });
+}
+
+function deselecionarTodas() {
+  document.querySelectorAll('#form-medalhas input[name="medalhaIds"]').forEach(function(cb) {
+    cb.checked = false;
+  });
+}
+</script>
+
+</body>
+</html>

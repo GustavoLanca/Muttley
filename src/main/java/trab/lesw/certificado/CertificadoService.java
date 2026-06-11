@@ -22,8 +22,8 @@ import trab.lesw.usuario.Usuario;
 
 @Service
 public class CertificadoService {
-    private static final String SECRET = "ValorTeste";
-    
+	private static final String SECRET = "ValorTeste";
+
     public byte[] gerarCertificado(Usuario usuario, Evento evento) {
         try {
             InputStream template = getClass().getClassLoader().getResourceAsStream("templates/certificado.pdf");
@@ -87,18 +87,17 @@ public class CertificadoService {
             }
 
             String dataEmissao = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            
+
             String hash = generateValidationHash(usuario, evento, dataEmissao); 
+            String tipoUsuario = usuario.getTipo() != null ? usuario.getTipo().toLowerCase() : "";
             
-            String tipoUsuario = usuario.getTipo() != null ? usuario.getTipo() : "";
-            
+            form.setField("tipo", "Este certificado é concedido ao "+tipoUsuario);
             form.setField("usuarioNome", nome);
-            form.setField("eventoTitulo", tituloEvento);
-            form.setField("eventoData", dataEvento);
-            form.setField("eventoCargaHoraria", duracao);
-            form.setField("dataAtual", dataEmissao);
+            form.setField("eventoTitulo", "Por  participar  do  evento " + tituloEvento + " realizado  no  dia " + dataEvento+",");
+            form.setField("eventoTitulo2", "promovido pela FATEC Zona Leste.");
+            form.setField("eventoCargaHoraria", "O evento foi realizado com carga horária de "+duracao);
+            form.setField("dataAtual", "São Paulo, " + dataEmissao + ".");
             form.setField("hashvalidation", hash);
-            form.setField("tipo", tipoUsuario);
             
             stamper.setFormFlattening(true);
             stamper.close();
@@ -123,8 +122,8 @@ public class CertificadoService {
             return "";
         }
 	}
-    
-    private byte[] gerarCertificadoSimples(Usuario usuario, Evento evento) {
+
+	private byte[] gerarCertificadoSimples(Usuario usuario, Evento evento) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             com.lowagie.text.Document doc = new com.lowagie.text.Document();

@@ -29,6 +29,7 @@
       <a th:href="@{/curso}">Cursos</a>
       <a th:href="@{/disciplina}">Disciplinas</a>
       <a th:href="@{/tag}">Tags</a>
+      <a th:href="@{/medalha/ranking}">Medalhas</a>
     </div>
   </div>
 </nav>
@@ -100,6 +101,18 @@
         </div>
         <h3>Tags</h3>
         <p>Registre e visualize tags e compet&ecirc;ncias.</p>
+        <span class="btn-custom btn-custom-primary">Acessar</span>
+      </a>
+
+      <a th:href="@{/medalha/ranking}" class="card-menu-custom">
+        <div class="icon" style="background:#FEF7E8;color:var(--muttley-gold);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="7"/>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+          </svg>
+        </div>
+        <h3>Medalhas</h3>
+        <p>Ranking de pontos e medalhas dos usu&aacute;rios.</p>
         <span class="btn-custom btn-custom-primary">Acessar</span>
       </a>
 

@@ -114,7 +114,11 @@
     <img id="qrCodeImage" src="" alt="QR Code">
     <p id="qrCodeUrl"></p>
   </div>
-  <div class="qr-modal-footer">
+  <div class="qr-modal-footer" style="display:flex;align-items:center;justify-content:space-between;">
+    <a id="qrDownloadBtn" href="#" class="btn-custom btn-custom-primary btn-custom-sm" style="font-size:.8rem;padding:6px 14px;text-decoration:none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Baixar
+    </a>
     <button type="button" class="btn-custom btn-custom-outline btn-custom-sm" onclick="fecharQrCode()">Fechar</button>
   </div>
 </div>
@@ -127,6 +131,7 @@ function mostrarQrCodeInscricao(btn) {
   document.getElementById('qrModalTitle').textContent = 'QR Code - Inscrição';
   document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
   document.getElementById('qrCodeUrl').textContent = url;
+  document.getElementById('qrDownloadBtn').href = '/qr/baixar?url=' + encodeURIComponent(url);
   document.getElementById('qrCodeModal').classList.add('show');
   document.getElementById('qrModalBackdrop').classList.add('show');
 }
@@ -138,6 +143,7 @@ function mostrarQrCodeConfirmar(btn) {
   document.getElementById('qrModalTitle').textContent = 'QR Code - Confirmar Participação';
   document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
   document.getElementById('qrCodeUrl').textContent = url;
+  document.getElementById('qrDownloadBtn').href = '/qr/baixar?url=' + encodeURIComponent(url);
   document.getElementById('qrCodeModal').classList.add('show');
   document.getElementById('qrModalBackdrop').classList.add('show');
 }

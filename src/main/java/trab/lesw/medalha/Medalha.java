@@ -34,6 +34,8 @@ public class Medalha implements Serializable {
 
     private String nome;
 
+    private Boolean entregue = false;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
