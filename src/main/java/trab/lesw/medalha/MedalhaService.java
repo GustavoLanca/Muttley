@@ -34,7 +34,7 @@ public class MedalhaService {
         boolean isNovo = medalha.getId() == null;
 
         if (!MEDALHA_PONTOS.equals(medalha.getNome())
-                && repository.contarMedalhasUsuarioProcedure(medalha.getUsuario().getId(), medalha.getNome()) > 0) {
+                && repository.countByUsuarioIdAndNome(medalha.getUsuario().getId(), medalha.getNome()) > 0) {
             return "Já existe uma medalha com este nome para este usuário!";
         }
 
@@ -53,7 +53,7 @@ public class MedalhaService {
             return;
         }
         for (Tag tag : tags) {
-            if (repository.contarMedalhasUsuarioProcedure(usuario.getId(), tag.getNome()) > 0) {
+            if (repository.countByUsuarioIdAndNome(usuario.getId(), tag.getNome()) > 0) {
                 continue;
             }
             Medalha medalha = new Medalha();
@@ -66,7 +66,7 @@ public class MedalhaService {
 
     public void awardMedalByPoints(Usuario usuario, int totalPontos) {
         int medalsEsperados = totalPontos / 10;
-        long medalsAtuais = repository.contarMedalhasUsuarioProcedure(usuario.getId(), MEDALHA_PONTOS);
+        long medalsAtuais = repository.countByUsuarioIdAndNome(usuario.getId(), MEDALHA_PONTOS);
 
         for (long i = medalsAtuais; i < medalsEsperados; i++) {
             Medalha medalha = new Medalha();

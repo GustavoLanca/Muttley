@@ -80,6 +80,10 @@ public class UsuarioController {
     public String salvar(@ModelAttribute Usuario usuario,
                          RedirectAttributes attr) {
         String msg = service.save(usuario);
+        if (msg.startsWith("CPF") || msg.startsWith("Digite")) {
+            attr.addFlashAttribute("erro", msg);
+            return "redirect:/usuario/formulario" + (usuario.getId() != null ? "/" + usuario.getId() : "");
+        }
         attr.addFlashAttribute("message", msg);
         return "redirect:/usuario";
     }

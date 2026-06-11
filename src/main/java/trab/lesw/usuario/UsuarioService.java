@@ -1,6 +1,7 @@
 package trab.lesw.usuario;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -45,6 +46,17 @@ public class UsuarioService {
 
     public String save(Usuario usuario) {
     	boolean isNovo = usuario.getId() == null;
+
+    	if (usuario.getCpf() != null && !usuario.getCpf().isEmpty()) {
+    	    if (!isValidCpf(usuario.getCpf())) {
+    	        return "Digite um CPF válido.";
+    	    }
+    	    Optional<Usuario> existente = repository.findByCpf(usuario.getCpf());
+    	    if (existente.isPresent() && (isNovo || !existente.get().getId().equals(usuario.getId()))) {
+     	        return "CPF já cadastrado no sistema.";
+     	    }
+     	}
+
     	if (!isNovo) {
     	    Usuario existente = repository.findById(usuario.getId()).orElse(null);
     	    if (existente != null) {
@@ -57,6 +69,29 @@ public class UsuarioService {
     	}
     	repository.save(usuario);
     	return isNovo ? "Usuário criado com sucesso!" : "Usuário atualizado com sucesso!";
+    }
+
+    private boolean isValidCpf(String cpf) {
+        String digits = cpf.replaceAll("\\D", "");
+        if (digits.length() != 11) return false;
+
+        if (digits.matches("(\\d)\\1{10}")) return false;
+
+        int sum = 0;
+        for (int i = 0; i < 9; i++) {
+            sum += (digits.charAt(i) - '0') * (10 - i);
+        }
+        int firstDigit = 11 - (sum % 11);
+        if (firstDigit >= 10) firstDigit = 0;
+        if (firstDigit != (digits.charAt(9) - '0')) return false;
+
+        sum = 0;
+        for (int i = 0; i < 10; i++) {
+            sum += (digits.charAt(i) - '0') * (11 - i);
+        }
+        int secondDigit = 11 - (sum % 11);
+        if (secondDigit >= 10) secondDigit = 0;
+        return secondDigit == (digits.charAt(10) - '0');
     }
 
     @Transactional

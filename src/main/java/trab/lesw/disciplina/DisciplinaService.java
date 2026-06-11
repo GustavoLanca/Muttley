@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import trab.lesw.curso.Curso;
+import trab.lesw.curso.CursoRepository;
 import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
  
@@ -15,6 +17,9 @@ public class DisciplinaService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CursoRepository cursoRepository;
  
     public List<Disciplina> getAll() {
         return repository.findAll(Sort.by("nome").ascending());
@@ -32,6 +37,13 @@ public class DisciplinaService {
             disciplina.setProfessor(professor);
         } else {
             disciplina.setProfessor(null);
+        }
+
+        if (disciplina.getCurso() != null && disciplina.getCurso().getId() != null) {
+            Curso curso = cursoRepository.findById(disciplina.getCurso().getId()).orElse(null);
+            disciplina.setCurso(curso);
+        } else {
+            disciplina.setCurso(null);
         }
 
         repository.save(disciplina);

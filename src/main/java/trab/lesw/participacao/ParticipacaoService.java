@@ -31,7 +31,7 @@ public class ParticipacaoService {
 	private EmailService emailService;
 
 	public String inscrever(Long usuarioId, Long eventoId) {
-		if (Boolean.TRUE.equals(repository.existeParticipacaoProcedure(usuarioId, eventoId))) {
+		if (repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
 			return "Usuário já está inscrito nesse evento!";
 		}
 		Evento evento = eventoRepository.getReferenceById(eventoId);
@@ -48,10 +48,10 @@ public class ParticipacaoService {
 	}
 
 	public String participar(Long usuarioId, Long eventoId) {
-		if (!Boolean.TRUE.equals(repository.existeParticipacaoProcedure(usuarioId, eventoId))) {
+		if (!repository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
 			return "Usuário não está inscrito nesse evento!";
 		}
-		if (Boolean.TRUE.equals(repository.existeParticipacaoConfirmadaProcedure(usuarioId, eventoId, true))) {
+		if (repository.existsByUsuarioIdAndEventoIdAndConfirmadoTrue(usuarioId, eventoId)) {
 			return "Usuário já confirmou participação nesse evento!";
 		}
 		Evento evento = eventoRepository.getReferenceById(eventoId);
@@ -64,7 +64,7 @@ public class ParticipacaoService {
 
 		medalhaService.awardMedal(usuario, evento);
 
-		Integer total = repository.calcularPontosUsuarioProcedure(usuario.getId());
+		Integer total = repository.sumPontosByUsuarioId(usuario.getId());
 		medalhaService.awardMedalByPoints(usuario, total != null ? total : 0);
 
 		return "Participação confirmada!";
@@ -75,7 +75,7 @@ public class ParticipacaoService {
 	}
 
 	public Integer calcularTotalPontos(Long usuarioId) {
-		Integer total = repository.calcularPontosUsuarioProcedure(usuarioId);
+		Integer total = repository.sumPontosByUsuarioId(usuarioId);
 		return total != null ? total : 0;
 	}
 

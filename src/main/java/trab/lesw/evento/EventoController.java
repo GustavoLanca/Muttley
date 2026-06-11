@@ -211,7 +211,7 @@ public class EventoController {
 
 		Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
 		if (opt.isEmpty()) {
-			attr.addFlashAttribute("erro", "CPF não encontrado.");
+			attr.addFlashAttribute("erro", "Digite um CPF válido.");
 			return "redirect:/evento/inscricao/" + id;
 		}
 
@@ -251,7 +251,7 @@ public class EventoController {
 
 		Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
 		if (opt.isEmpty()) {
-			attr.addFlashAttribute("erro", "CPF não encontrado.");
+			attr.addFlashAttribute("erro", "Digite um CPF válido.");
 			return "redirect:/evento/confirmar/" + id;
 		}
 
@@ -267,7 +267,7 @@ public class EventoController {
 			return "redirect:/evento/confirmar/" + id;
 		}
 
-		if (Boolean.FALSE.equals(certificadoRepository.existeCertificadoProcedure(usuario.getId(), id))) {
+		if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuario.getId(), id)) {
 			try {
 				byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
 				if (pdfBytes.length > 0) {
@@ -279,24 +279,73 @@ public class EventoController {
 					Path destino = uploadPath.resolve(nomeArquivo);
 					Files.write(destino, pdfBytes);
 
+					emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
+							"Sua presença no evento " + evento.getTitulo() + " foi confirmada com sucesso. \n "
+									+ "Segue em anexo o seu certificado do evento.",
+							pdfBytes, "certificado.pdf");
+
 					Certificado cert = new Certificado();
 					cert.setUsuario(usuario);
 					cert.setEvento(evento);
 					cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
 					cert.setDataEmissao(LocalDateTime.now());
 					certificadoRepository.save(cert);
-					emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
-							"Sua presença no evento " + evento.getTitulo() + " foi confirmada com sucesso. \n "
-									+ "Segue em anexo o seu certificado do evento.",
-							pdfBytes, "certificado.pdf"); 
 				}
 			} catch (Exception e) {
 				log.error("Erro ao gerar certificado automático", e);
 			}
 		}
 
-		return "redirect:/linkedin/auth?usuarioId=" + usuario.getId() + "&eventoId=" + id;
+		for (Usuario staff : evento.getOrganizadores()) {
+			if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
+				gerarCertificado(staff, evento);
+			}
+		}
+		for (Usuario staff : evento.getPalestrantes()) {
+			if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
+				gerarCertificado(staff, evento);
+			}
+		}
+		for (Usuario staff : evento.getProfessores()) {
+			if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
+				gerarCertificado(staff, evento);
+			}
+		}
+
+		return "redirect:/evento/confirmado/" + id + "/" + usuario.getId();
 	}
+
+	private void gerarCertificado(Usuario usuario, Evento evento) {
+		log.info("Gerando certificado para usuario {} no evento {}", usuario.getId(), evento.getId());
+		try {
+			byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
+			if (pdfBytes.length > 0) {
+				String projectDir = System.getProperty("user.dir");
+				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
+				Files.createDirectories(uploadPath);
+				String nomeArquivo = usuario.getId() + "_" + evento.getId() + ".pdf";
+				Path destino = uploadPath.resolve(nomeArquivo);
+				Files.write(destino, pdfBytes);
+
+				emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
+						"Olá " + usuario.getNome() + ",\n\n"
+						+ "Seu certificado de participação no evento \"" + evento.getTitulo() + "\" foi gerado com sucesso.\n"
+						+ "Segue em anexo o seu certificado.\n\n"
+						+ "Att,\nMuttley",
+						pdfBytes, "certificado.pdf");
+
+				Certificado cert = new Certificado();
+				cert.setUsuario(usuario);
+				cert.setEvento(evento);
+				cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
+				cert.setDataEmissao(LocalDateTime.now());
+				certificadoRepository.save(cert);
+			}
+		} catch (Exception e) {
+			log.error("Erro ao gerar certificado para usuario " + usuario.getId(), e);
+		}
+	}
+	
 
 	@GetMapping("/confirmado/{id}/{usuarioId}")
 	public String confirmado(@PathVariable Long id, @PathVariable Long usuarioId, Model model) {
@@ -323,7 +372,7 @@ public class EventoController {
 				return ResponseEntity.internalServerError().build();
 			}
 
-			if (Boolean.FALSE.equals(certificadoRepository.existeCertificadoProcedure(usuarioId, eventoId))) {
+			if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuarioId, eventoId)) {
 				String projectDir = System.getProperty("user.dir");
 				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads",
 						"certificados");

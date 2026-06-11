@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Disciplinas</title>
+  <title>Cursos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,8 +26,8 @@
       <a th:href="@{/}">Início</a>
       <a th:href="@{/evento}">Eventos</a>
       <a th:href="@{/usuario}">Usuários</a>
-      <a th:href="@{/curso}">Cursos</a>
-      <a th:href="@{/disciplina}" class="active">Disciplinas</a>
+      <a th:href="@{/curso}" class="active">Cursos</a>
+      <a th:href="@{/disciplina}">Disciplinas</a>
       <a th:href="@{/tag}">Tags</a>
     </div>
   </div>
@@ -36,8 +36,8 @@
 <main>
   <div class="container-page">
     <div class="page-header">
-      <h1 class="page-title">Lista de Disciplinas</h1>
-      <a th:href="@{/disciplina/formulario}" class="btn-custom btn-custom-primary">+ Nova Disciplina</a>
+      <h1 class="page-title">Lista de Cursos</h1>
+      <a th:href="@{/curso/formulario}" class="btn-custom btn-custom-primary">+ Novo Curso</a>
     </div>
 
     <th:block th:if="${#lists.isEmpty(lista)}">
@@ -45,10 +45,10 @@
         <div class="card-custom-body">
           <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5"/>
             </svg>
-            <p>Nenhuma disciplina cadastrada.</p>
+            <p>Nenhum curso cadastrado.</p>
           </div>
         </div>
       </div>
@@ -62,24 +62,22 @@
               <tr>
                 <th>ID</th>
                 <th>Nome</th>
-                <th>Professor</th>
-                <th>Curso</th>
+                <th>Disciplinas</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              <tr th:each="d : ${lista}">
-                <td data-label="ID" th:text="${d.id}"></td>
-                <td data-label="Nome" th:text="${d.nome}"></td>
-                <td data-label="Professor" th:text="${d.professor != null ? d.professor.nome : '—'}"></td>
-                <td data-label="Curso" th:text="${d.curso != null ? d.curso.nome : '—'}"></td>
+              <tr th:each="c : ${lista}">
+                <td data-label="ID" th:text="${c.id}"></td>
+                <td data-label="Nome" th:text="${c.nome}"></td>
+                <td data-label="Disciplinas" th:text="${#lists.size(c.disciplinas)}"></td>
                 <td data-label="Ações">
                   <div class="actions-cell">
-                    <a th:href="@{'/disciplina/formulario/' + ${d.id}}"
+                    <a th:href="@{'/curso/formulario/' + ${c.id}}"
                        class="btn-custom btn-custom-outline btn-custom-sm">Editar</a>
-                    <a th:href="@{'/disciplina/delete/' + ${d.id}}"
+                    <a th:href="@{'/curso/delete/' + ${c.id}}"
                        class="btn-custom btn-custom-danger btn-custom-sm"
-                       onclick="return confirm('Excluir esta disciplina?')">Excluir</a>
+                       onclick="return confirm('Excluir este curso?')">Excluir</a>
                   </div>
                 </td>
               </tr>

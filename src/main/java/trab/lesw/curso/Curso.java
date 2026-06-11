@@ -1,9 +1,9 @@
-package trab.lesw.usuario;
+package trab.lesw.curso;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,19 +15,16 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import trab.lesw.medalha.Medalha;
-import trab.lesw.participacao.Participacao;
-
+import trab.lesw.disciplina.Disciplina;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "curso")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Usuario implements Serializable {
-
+public class Curso implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -35,26 +32,7 @@ public class Usuario implements Serializable {
     private Long id;
 
     private String nome;
-    
-    private String email;
-    
-    private String linkedin;
 
-    @Column(length = 2048)
-    private String linkedinToken;
-
-    private Long linkedinTokenExpires;
-
-    private String linkedinPersonId;
-
-    @Column(unique = true)
-    private String cpf;
-    
-    private String tipo;
-    
-    @OneToMany(mappedBy = "usuario")
-    private List<Medalha> medalhas;
-
-    @OneToMany(mappedBy = "usuario")
-    private List<Participacao> participacoes;
+    @OneToMany(mappedBy = "curso")
+    private List<Disciplina> disciplinas = new ArrayList<>();
 }

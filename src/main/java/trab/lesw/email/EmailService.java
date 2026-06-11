@@ -32,26 +32,20 @@ public class EmailService {
 	}
 
 	public void enviarEmailComAnexo(String destinatario, String assunto, String mensagem, byte[] arquivo,
-			String nomeArquivo) {
+			String nomeArquivo) throws Exception {
 
-		try {
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
 
-			MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
-			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+		helper.setTo(destinatario);
+		helper.setSubject(assunto);
+		helper.setText(mensagem);
 
-			helper.setTo(destinatario);
-			helper.setSubject(assunto);
-			helper.setText(mensagem);
+		ByteArrayResource resource = new ByteArrayResource(arquivo);
 
-			ByteArrayResource resource = new ByteArrayResource(arquivo);
+		helper.addAttachment(nomeArquivo, resource);
 
-			helper.addAttachment(nomeArquivo, resource);
-
-			mailSender.send(mimeMessage);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		mailSender.send(mimeMessage);
 	}
 }

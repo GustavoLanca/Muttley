@@ -27,6 +27,7 @@
       <a th:href="@{/}">Início</a>
       <a th:href="@{/evento}" class="active">Eventos</a>
       <a th:href="@{/usuario}">Usuários</a>
+      <a th:href="@{/curso}">Cursos</a>
       <a th:href="@{/disciplina}">Disciplinas</a>
       <a th:href="@{/tag}">Tags</a>
     </div>
@@ -200,10 +201,12 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                       <input type="date" class="form-control-custom"
                              name="inicioInscricaoDate" id="inicioInscricaoDate"
-                             th:value="${evento.inicioInscricao != null ? #temporals.format(evento.inicioInscricao, 'yyyy-MM-dd') : ''}">
+                             th:value="${evento.inicioInscricao != null ? #temporals.format(evento.inicioInscricao, 'yyyy-MM-dd') : ''}"
+                             required>
                       <input type="time" class="form-control-custom"
                              name="inicioInscricaoTime" id="inicioInscricaoTime"
-                             th:value="${evento.inicioInscricao != null ? #temporals.format(evento.inicioInscricao, 'HH:mm') : ''}">
+                             th:value="${evento.inicioInscricao != null ? #temporals.format(evento.inicioInscricao, 'HH:mm') : ''}"
+                             required>
                     </div>
                   </div>
                   <div class="form-group">
@@ -211,10 +214,12 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                       <input type="date" class="form-control-custom"
                              name="fimInscricaoDate" id="fimInscricaoDate"
-                             th:value="${evento.fimInscricao != null ? #temporals.format(evento.fimInscricao, 'yyyy-MM-dd') : ''}">
+                             th:value="${evento.fimInscricao != null ? #temporals.format(evento.fimInscricao, 'yyyy-MM-dd') : ''}"
+                             required>
                       <input type="time" class="form-control-custom"
                              name="fimInscricaoTime" id="fimInscricaoTime"
-                             th:value="${evento.fimInscricao != null ? #temporals.format(evento.fimInscricao, 'HH:mm') : ''}">
+                             th:value="${evento.fimInscricao != null ? #temporals.format(evento.fimInscricao, 'HH:mm') : ''}"
+                             required>
                     </div>
                   </div>
                 </div>
@@ -228,10 +233,12 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                       <input type="date" class="form-control-custom"
                              name="inicioConfirmacaoDate" id="inicioConfirmacaoDate"
-                             th:value="${evento.inicioConfirmacao != null ? #temporals.format(evento.inicioConfirmacao, 'yyyy-MM-dd') : ''}">
+                             th:value="${evento.inicioConfirmacao != null ? #temporals.format(evento.inicioConfirmacao, 'yyyy-MM-dd') : ''}"
+                             required>
                       <input type="time" class="form-control-custom"
                              name="inicioConfirmacaoTime" id="inicioConfirmacaoTime"
-                             th:value="${evento.inicioConfirmacao != null ? #temporals.format(evento.inicioConfirmacao, 'HH:mm') : ''}">
+                             th:value="${evento.inicioConfirmacao != null ? #temporals.format(evento.inicioConfirmacao, 'HH:mm') : ''}"
+                             required>
                     </div>
                   </div>
                   <div class="form-group">
@@ -239,10 +246,12 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                       <input type="date" class="form-control-custom"
                              name="fimConfirmacaoDate" id="fimConfirmacaoDate"
-                             th:value="${evento.fimConfirmacao != null ? #temporals.format(evento.fimConfirmacao, 'yyyy-MM-dd') : ''}">
+                             th:value="${evento.fimConfirmacao != null ? #temporals.format(evento.fimConfirmacao, 'yyyy-MM-dd') : ''}"
+                             required>
                       <input type="time" class="form-control-custom"
                              name="fimConfirmacaoTime" id="fimConfirmacaoTime"
-                             th:value="${evento.fimConfirmacao != null ? #temporals.format(evento.fimConfirmacao, 'HH:mm') : ''}">
+                             th:value="${evento.fimConfirmacao != null ? #temporals.format(evento.fimConfirmacao, 'HH:mm') : ''}"
+                             required>
                     </div>
                   </div>
                 </div>

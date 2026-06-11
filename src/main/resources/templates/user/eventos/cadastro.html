@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<nav class="navbar-muttley" th:if="${publicForm}">
+<nav class="navbar-muttley">
   <div class="navbar-inner">
     <a th:href="@{/user/evento}" class="navbar-brand">
       <img th:src="@{/muttleyR.png}" alt="Muttley">
@@ -31,41 +31,23 @@
   </div>
 </nav>
 
-<nav class="navbar-muttley" th:unless="${publicForm}">
-  <div class="navbar-inner">
-    <a th:href="@{/}" class="navbar-brand">
-      <img th:src="@{/muttleyR.png}" alt="Muttley">
-      Muttley
-    </a>
-    <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    <div class="navbar-links">
-      <a th:href="@{/}">Início</a>
-      <a th:href="@{/evento}">Eventos</a>
-      <a th:href="@{/usuario}" class="active">Usuários</a>
-      <a th:href="@{/curso}">Cursos</a>
-      <a th:href="@{/disciplina}">Disciplinas</a>
-      <a th:href="@{/tag}">Tags</a>
-    </div>
-  </div>
-</nav>
-
 <main>
   <div class="container-page" style="max-width:560px;">
     <div class="page-header">
-      <h1 class="page-title" th:text="${publicForm} ? 'Cadastro' : (${usuario.id != null} ? 'Editar Usuário' : 'Novo Usuário')"></h1>
+      <h1 class="page-title">Criar Conta</h1>
     </div>
 
     <div th:if="${erro}" class="badge-custom" style="background: #fee2e2; color: #ef4444; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: block; text-align: center; font-weight: 500;">
       <span th:text="${erro}"></span>
     </div>
 
+    <div th:if="${sucesso}" class="badge-custom" style="background: #dcfce7; color: #16a34a; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: block; text-align: center; font-weight: 500;">
+      <span th:text="${sucesso}"></span>
+    </div>
+
     <div class="card-custom">
       <div class="card-custom-body">
-        <form th:action="${publicForm} ? '/user/evento/cadastro' : '/usuario/salvar'" th:object="${usuario}" method="post"
+        <form th:action="@{/user/evento/cadastro}" th:object="${usuario}" method="post"
               novalidate onsubmit="return validarFormUsuario(this)">
 
           <input type="hidden" th:field="*{id}"/>
@@ -115,8 +97,8 @@
           </div>
 
           <div class="card-custom-footer" style="margin-top:20px;padding:16px 0 0;border-top:1px solid var(--gray-100);background:transparent;">
-            <a th:href="${publicForm} ? '/user/evento' : '/usuario'" class="btn-custom btn-custom-outline">Voltar</a>
-            <button type="submit" class="btn-custom btn-custom-primary">Salvar</button>
+            <a th:href="@{/user/evento}" class="btn-custom btn-custom-outline">Voltar</a>
+            <button type="submit" class="btn-custom btn-custom-primary">Cadastrar</button>
           </div>
 
         </form>
@@ -149,7 +131,6 @@ function validarFormUsuario(form) {
         valido = false;
       }
     }
-
   });
   return valido;
 }

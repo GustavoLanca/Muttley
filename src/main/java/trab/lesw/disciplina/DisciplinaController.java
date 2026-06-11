@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.transaction.Transactional;
+import trab.lesw.curso.CursoRepository;
 import trab.lesw.usuario.UsuarioRepository;
  
 @Controller
@@ -18,6 +19,9 @@ public class DisciplinaController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CursoRepository cursoRepository;
  
     @GetMapping
     public String listar(Model model) {
@@ -29,6 +33,7 @@ public class DisciplinaController {
     public String novo(Model model) {
         model.addAttribute("disciplina", new Disciplina());
         model.addAttribute("professores", usuarioRepository.findAll());
+        model.addAttribute("cursos", cursoRepository.findAll());
         return "disciplina/formulario";
     }
 
@@ -36,6 +41,7 @@ public class DisciplinaController {
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("disciplina", service.getById(id));
         model.addAttribute("professores", usuarioRepository.findAll());
+        model.addAttribute("cursos", cursoRepository.findAll());
         return "disciplina/formulario";
     }
 

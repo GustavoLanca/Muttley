@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import trab.lesw.curso.Curso;
 import trab.lesw.usuario.Usuario;
 
 @Entity
@@ -35,4 +36,8 @@ public class Disciplina implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "professor_id")
 	private Usuario professor;
+
+	@ManyToOne
+	@JoinColumn(name = "curso_id", nullable = false)
+	private Curso curso;
 }
