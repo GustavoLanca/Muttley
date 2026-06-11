@@ -19,7 +19,8 @@ import trab.lesw.usuario.Usuario;
 
 @Service
 public class CertificadoService {
-
+    private static final String SECRET = "ValorTeste";
+    
     public byte[] gerarCertificado(Usuario usuario, Evento evento) {
         try {
             InputStream template = getClass().getClassLoader().getResourceAsStream("templates/certificado.pdf");
@@ -54,6 +55,10 @@ public class CertificadoService {
                 form.setFieldProperty("eventoCargaHoraria", "textsize", 17.5f, null);
                 form.setFieldProperty("dataAtual", "textfont", calibriRegular, null);
                 form.setFieldProperty("dataAtual", "textsize", 17.5f, null);
+                form.setFieldProperty("tipo", "textfont", calibriRegular, null);
+                form.setFieldProperty("tipo", "textsize", 16.5f, null);
+                form.setFieldProperty("hashValidation","textfont", calibriRegular, null);
+                form.setFieldProperty("hashValidation","textsize", 11f, null);
             }
 
             
@@ -79,13 +84,19 @@ public class CertificadoService {
             }
 
             String dataEmissao = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
+            
+            String hash = generateValidationHash(usuario, evento, dataEmissao); 
+            
+            String tipoUsuario = usuario.getTipo() != null ? usuario.getTipo() : "";
+            
             form.setField("usuarioNome", nome);
             form.setField("eventoTitulo", tituloEvento);
             form.setField("eventoData", dataEvento);
             form.setField("eventoCargaHoraria", duracao);
             form.setField("dataAtual", dataEmissao);
-
+            form.setField("hashvalidation", hash);
+            form.setField("tipo", tipoUsuario);
+            
             stamper.setFormFlattening(true);
             stamper.close();
             reader.close();
@@ -95,6 +106,21 @@ public class CertificadoService {
         }
     }
 
+    private String generateValidationHash(Usuario usuario, Evento evento, String dataEmissao) {
+    	String input = usuario.getId() + "-" + evento.getId() + "-" + dataEmissao + "-" + SECRET;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hashBytes) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            return "";
+        }
+	}
+    
     private byte[] gerarCertificadoSimples(Usuario usuario, Evento evento) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
