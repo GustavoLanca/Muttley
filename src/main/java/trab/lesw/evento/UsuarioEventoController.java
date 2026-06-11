@@ -1,5 +1,10 @@
 package trab.lesw.evento;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +34,7 @@ import trab.lesw.medalha.Medalha;
 import trab.lesw.medalha.MedalhaRepository;
 import trab.lesw.participacao.Participacao;
 import trab.lesw.participacao.ParticipacaoRepository;
+import trab.lesw.participacao.ParticipacaoService;
 import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
 import trab.lesw.usuario.UsuarioService;
@@ -47,6 +53,9 @@ public class UsuarioEventoController {
 
     @Autowired
     private ParticipacaoRepository participacaoRepository;
+
+    @Autowired
+    private ParticipacaoService participacaoService;
 
     @Autowired
     private UsuarioService usuarioService;
@@ -75,13 +84,162 @@ public class UsuarioEventoController {
     }
 
     @GetMapping("/inscricao/{id}")
-    public String inscricaoForm(@PathVariable Long id, RedirectAttributes attr) {
+    public String inscricaoForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
         Evento evento = service.getById(id);
         if (!evento.isInscricaoAberta()) {
             attr.addFlashAttribute("erro", "As inscrições para este evento estão fechadas.");
             return "redirect:/user/evento";
         }
-        return "redirect:/evento/inscricao/" + id;
+        model.addAttribute("evento", evento);
+        return "evento/inscricao";
+    }
+
+    @PostMapping("/inscricao/{id}")
+    public String inscrever(@PathVariable Long id, @RequestParam String cpf, RedirectAttributes attr) {
+        Evento evento = service.getById(id);
+
+        if (!evento.isInscricaoAberta()) {
+            attr.addFlashAttribute("erro", "As inscrições para este evento estão fechadas.");
+            return "redirect:/user/evento/inscricao/" + id;
+        }
+
+        Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
+        if (opt.isEmpty()) {
+            attr.addFlashAttribute("erro", "Digite um CPF válido.");
+            return "redirect:/user/evento/inscricao/" + id;
+        }
+
+        Usuario usuario = opt.get();
+
+        String msg = participacaoService.inscrever(usuario.getId(), id);
+        if (msg.equals("Usuário já está inscrito nesse evento!")) {
+            attr.addFlashAttribute("erro", msg);
+            return "redirect:/user/evento/inscricao/" + id;
+        }
+
+        attr.addFlashAttribute("sucesso", msg);
+        return "redirect:/user/evento";
+    }
+
+    @GetMapping("/confirmar/{id}")
+    public String confirmarForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
+        Evento evento = service.getById(id);
+        if (!evento.isConfirmacaoAberta()) {
+            attr.addFlashAttribute("erro", "Confirmação fechada no momento. Verifique o período de confirmação do evento.");
+            return "redirect:/user/evento";
+        }
+        model.addAttribute("evento", evento);
+        return "evento/confirmar";
+    }
+
+    @PostMapping("/confirmar/{id}")
+    public String confirmar(@PathVariable Long id, @RequestParam String cpf, RedirectAttributes attr) {
+        Evento evento = service.getById(id);
+
+        if (!evento.isConfirmacaoAberta()) {
+            attr.addFlashAttribute("erro", "Confirmação fechada no momento. Verifique o período de confirmação do evento.");
+            return "redirect:/user/evento/confirmar/" + id;
+        }
+
+        Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
+        if (opt.isEmpty()) {
+            attr.addFlashAttribute("erro", "Digite um CPF válido.");
+            return "redirect:/user/evento/confirmar/" + id;
+        }
+
+        Usuario usuario = opt.get();
+
+        String msg = participacaoService.participar(usuario.getId(), id);
+        if (msg.equals("Usuário não está inscrito nesse evento!")) {
+            attr.addFlashAttribute("erro", msg);
+            return "redirect:/user/evento/confirmar/" + id;
+        }
+        if (msg.equals("Usuário já confirmou participação nesse evento!")) {
+            attr.addFlashAttribute("erro", msg);
+            return "redirect:/user/evento/confirmar/" + id;
+        }
+
+        if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuario.getId(), id)) {
+            try {
+                byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
+                if (pdfBytes.length > 0) {
+                    String projectDir = System.getProperty("user.dir");
+                    Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads",
+                            "certificados");
+                    Files.createDirectories(uploadPath);
+                    String nomeArquivo = usuario.getId() + "_" + id + ".pdf";
+                    Path destino = uploadPath.resolve(nomeArquivo);
+                    Files.write(destino, pdfBytes);
+
+                    emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
+                            "Sua presença no evento " + evento.getTitulo() + " foi confirmada com sucesso. \n "
+                                    + "Segue em anexo o seu certificado do evento.",
+                            pdfBytes, "certificado.pdf");
+
+                    Certificado cert = new Certificado();
+                    cert.setUsuario(usuario);
+                    cert.setEvento(evento);
+                    cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
+                    cert.setDataEmissao(LocalDateTime.now());
+                    String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    cert.setHash(certificadoService.generateValidationHash(usuario, evento, dataEmissaoStr));
+                    certificadoRepository.save(cert);
+                }
+            } catch (Exception e) {
+                log.error("Erro ao gerar certificado automático", e);
+            }
+        }
+
+        for (Usuario staff : evento.getOrganizadores()) {
+            if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
+                gerarCertificado(staff, evento);
+            }
+        }
+        for (Usuario staff : evento.getPalestrantes()) {
+            if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
+                gerarCertificado(staff, evento);
+            }
+        }
+        for (Usuario staff : evento.getProfessores()) {
+            if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
+                gerarCertificado(staff, evento);
+            }
+        }
+
+        return "redirect:/user/evento";
+    }
+
+    private void gerarCertificado(Usuario usuario, Evento evento) {
+        log.info("Gerando certificado para usuario {} no evento {}", usuario.getId(), evento.getId());
+        try {
+            byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
+            if (pdfBytes.length > 0) {
+                String projectDir = System.getProperty("user.dir");
+                Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
+                Files.createDirectories(uploadPath);
+                String nomeArquivo = usuario.getId() + "_" + evento.getId() + ".pdf";
+                Path destino = uploadPath.resolve(nomeArquivo);
+                Files.write(destino, pdfBytes);
+
+                emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
+                        "Olá " + usuario.getNome() + ",\n\n"
+                        + "Seu certificado de participação no evento \"" + evento.getTitulo() + "\" foi gerado com sucesso.\n"
+                        + "Segue em anexo o seu certificado.\n\n"
+                        + "Att,\nMuttley",
+                        pdfBytes, "certificado.pdf");
+
+                Certificado cert = new Certificado();
+                cert.setUsuario(usuario);
+                cert.setEvento(evento);
+                cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
+                cert.setDataEmissao(LocalDateTime.now());
+                String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                cert.setHash(certificadoService.generateValidationHash(usuario, evento, dataEmissaoStr));
+                certificadoRepository.save(cert);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao gerar certificado para usuario " + usuario.getId(), e);
+        }
     }
 
     @GetMapping("/detalhes/{id}")
@@ -112,79 +270,50 @@ public class UsuarioEventoController {
         return "user/eventos/participacoes";
     }
 
-    @GetMapping("/medalhas")
+    @GetMapping("/certificado")
     public String paginaMedalhas() {
         return "user/eventos/medalhas";
     }
 
-    @PostMapping("/medalhas")
+    @PostMapping("/certificado")
     public String processarMedalhas(@RequestParam String cpf, RedirectAttributes attr) {
         Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
         
         if (opt.isEmpty()) {
             attr.addFlashAttribute("erro", "Digite um CPF válido.");
-            return "redirect:/user/evento/medalhas";
+            return "redirect:/user/evento/certificado";
         }
 
         Usuario usuario = opt.get();
         String email = usuario.getEmail();
 
-        List<Medalha> medalhas = medalhaRepository.findByUsuarioId(usuario.getId());
         List<Certificado> certificados = certificadoRepository.findByUsuarioIdWithEvento(usuario.getId());
 
-        StringBuilder corpo = new StringBuilder();
-        corpo.append("Olá ").append(usuario.getNome()).append("!\n\n");
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setTo(email);
+            helper.setSubject("Seus Certificados - Muttley");
+            helper.setText("Olá " + usuario.getNome() + "!\n\nSegue em anexo os seus certificados.\n\nAtt,\nMuttley");
 
-        corpo.append("=== MEDALHAS ===\n");
-        if (medalhas.isEmpty()) {
-            corpo.append("Nenhuma medalha conquistada ainda.\n");
-        } else {
-            for (Medalha m : medalhas) {
-                corpo.append("- ").append(m.getNome());
-                if (m.getEvento() != null) {
-                    corpo.append(" (").append(m.getEvento().getTitulo()).append(")");
-                }
-                corpo.append("\n");
-            }
-        }
-
-        corpo.append("\n=== CERTIFICADOS ===\n");
-        if (certificados.isEmpty()) {
-            corpo.append("Nenhum certificado emitido ainda.\n");
-        } else {
-            corpo.append("Total de certificados: ").append(certificados.size()).append("\n\n");
-        }
-
-        corpo.append("Att,\nMuttley");
-
-        if (certificados.isEmpty()) {
-            emailService.enviarEmail(email, "Suas Medalhas e Certificados - Muttley", corpo.toString());
-        } else {
-            try {
-                MimeMessage mimeMessage = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-                helper.setTo(email);
-                helper.setSubject("Suas Medalhas e Certificados - Muttley");
-                helper.setText(corpo.toString());
-
-                for (Certificado c : certificados) {
-                    if (c.getEvento() != null) {
-                        byte[] pdf = certificadoService.gerarCertificado(usuario, c.getEvento());
-                        if (pdf.length > 0) {
-                            String nomeArquivo = "certificado_" + c.getEvento().getTitulo().replaceAll("\\s+", "_") + ".pdf";
-                            helper.addAttachment(nomeArquivo, new ByteArrayResource(pdf));
-                        }
+            for (Certificado c : certificados) {
+                if (c.getEvento() != null) {
+                    byte[] pdf = certificadoService.gerarCertificado(usuario, c.getEvento());
+                    if (pdf.length > 0) {
+                        String nomeArquivo = "certificado_" + c.getEvento().getTitulo().replaceAll("\\s+", "_") + ".pdf";
+                        helper.addAttachment(nomeArquivo, new ByteArrayResource(pdf));
                     }
                 }
-                mailSender.send(mimeMessage);
-            } catch (Exception e) {
-                log.error("Erro ao enviar email com certificados", e);
-                emailService.enviarEmail(email, "Suas Medalhas e Certificados - Muttley", corpo.toString());
             }
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            log.error("Erro ao enviar email com certificados", e);
+            emailService.enviarEmail(email, "Seus Certificados - Muttley",
+                    "Olá " + usuario.getNome() + "!\n\nSegue em anexo os seus certificados.\n\nAtt,\nMuttley");
         }
 
-        attr.addFlashAttribute("sucesso", "O relatório com as suas medalhas e certificados foi enviado para " + email);
-        return "redirect:/user/evento/medalhas";
+        attr.addFlashAttribute("sucesso", "Os seus certificados foram enviados para " + email);
+        return "redirect:/user/evento/certificado";
     }
 
     @GetMapping("/cadastro")

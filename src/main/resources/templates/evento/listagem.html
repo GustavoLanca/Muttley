@@ -74,8 +74,8 @@
             <tbody>
               <tr th:each="e : ${lista}"
                   th:data-id="${e.id}"
-                  th:data-url-inscricao="${baseUrl + '/evento/inscricao/' + e.id}"
-                  th:data-url-confirmar="${baseUrl + '/evento/confirmar/' + e.id}"
+                  th:data-url-inscricao="${baseUrl + '/user/evento/inscricao/' + e.id}"
+                  th:data-url-confirmar="${baseUrl + '/user/evento/confirmar/' + e.id}"
                   th:data-inscricao-aberta="${e.inscricaoAberta}"
                   th:data-confirmacao-aberta="${e.confirmacaoAberta}">
                 <td data-label="ID" th:text="${e.id}"></td>

@@ -13,9 +13,9 @@
 
 <nav class="navbar-muttley">
   <div class="navbar-inner">
-    <a th:href="@{/}" class="navbar-brand">
+    <a th:href="@{/user/evento}" class="navbar-brand">
       <img th:src="@{/muttleyR.png}" alt="Muttley">
-      Muttley
+      Muttley 
     </a>
     <button class="nav-toggle" onclick="this.classList.toggle('active');document.querySelector('.navbar-links').classList.toggle('open')" aria-label="Menu">
       <span></span>
@@ -23,13 +23,10 @@
       <span></span>
     </button>
     <div class="navbar-links">
-      <a th:href="@{/}">Início</a>
-      <a th:href="@{/evento}" class="active">Eventos</a>
-      <a th:href="@{/usuario}">Usuários</a>
-      <a th:href="@{/curso}">Cursos</a>
-      <a th:href="@{/disciplina}">Disciplinas</a>
-      <a th:href="@{/tag}">Tags</a>
-      <a th:href="@{/medalha/ranking}">Medalhas</a>
+      <a th:href="@{/user/evento}">Eventos Disponíveis</a>
+      <a th:href="@{/user/evento/participacoes}">Minhas Participações</a>
+      <a th:href="@{/user/evento/certificado}">Certificados</a>
+      <a th:href="@{/user/evento/cadastro}">Cadastro</a>
     </div>
   </div>
 </nav>
@@ -50,7 +47,7 @@
 
     <div class="card-custom">
       <div class="card-custom-body">
-        <form th:if="${sucesso == null}" th:action="@{'/evento/confirmar/' + ${evento.id}}" method="post">
+        <form th:if="${sucesso == null}" th:action="@{'/user/evento/confirmar/' + ${evento.id}}" method="post">
           <div class="form-custom">
             <p style="text-align:center;color:var(--gray-500);font-size:.875rem;margin:0;">
               Confirme sua participação no evento informando seu CPF.
@@ -62,6 +59,9 @@
                      placeholder="Apenas números" maxlength="11" required>
             </div>
 
+            <div style="text-align: center; margin-top: 16px;">
+              <button type="submit" class="btn-custom btn-custom-primary">Confirmar</button>
+            </div>
             <div style="text-align: center; margin-top: 12px;">
               <span style="color: var(--gray-400); font-size: 0.875rem;">Não possui cadastro?</span>
               <a th:href="@{/user/evento/cadastro}" class="btn-custom btn-custom-outline btn-custom-sm" style="margin-left: 6px;">Cadastre-se</a>
@@ -71,7 +71,7 @@
 
         <div th:if="${sucesso != null}" style="text-align:center;">
           <a th:href="${downloadUrl}" class="btn-custom btn-custom-success">Baixar Certificado</a>
-          <a th:href="@{'/evento/confirmar/' + ${evento.id}}" class="btn-custom btn-custom-outline" style="margin-left:8px;">Nova Confirmação</a>
+          <a th:href="@{'/user/evento/confirmar/' + ${evento.id}}" class="btn-custom btn-custom-outline" style="margin-left:8px;">Nova Confirmação</a>
         </div>
       </div>
     </div>

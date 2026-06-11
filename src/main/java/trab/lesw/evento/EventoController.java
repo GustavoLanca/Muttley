@@ -31,11 +31,8 @@ import trab.lesw.certificado.Certificado;
 import trab.lesw.certificado.CertificadoRepository;
 import trab.lesw.certificado.CertificadoService;
 import trab.lesw.disciplina.DisciplinaRepository;
-import trab.lesw.email.EmailService;
-import trab.lesw.linkedin.LinkedInService;
 import trab.lesw.participacao.Participacao;
 import trab.lesw.participacao.ParticipacaoRepository;
-import trab.lesw.participacao.ParticipacaoService;
 import trab.lesw.tag.TagRepository;
 import trab.lesw.usuario.Usuario;
 import trab.lesw.usuario.UsuarioRepository;
@@ -53,22 +50,13 @@ public class EventoController {
 	private TagRepository tagRepository;
 
 	@Autowired
-	private EmailService emailService;
-
-	@Autowired
 	private DisciplinaRepository disciplinaRepository;
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 
 	@Autowired
-	private ParticipacaoService participacaoService;
-
-	@Autowired
 	private ParticipacaoRepository participacaoRepository;
-
-	@Autowired
-	private LinkedInService linkedInService;
 
 	@Autowired
 	private CertificadoService certificadoService;
@@ -188,170 +176,7 @@ public class EventoController {
 		return "evento/formulario";
 	}
 
-	@GetMapping("/inscricao/{id}")
-	public String inscricaoForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
-		Evento evento = service.getById(id);
-		if (!evento.isInscricaoAberta()) {
-			attr.addFlashAttribute("erro",
-					"Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
-			return "redirect:/evento";
-		}
-		model.addAttribute("evento", evento);
-		return "evento/inscricao";
-	}
-
-	@PostMapping("/inscricao/{id}")
-	public String inscrever(@PathVariable Long id, @RequestParam String cpf, RedirectAttributes attr) {
-		Evento evento = service.getById(id);
-
-		if (!evento.isInscricaoAberta()) {
-			attr.addFlashAttribute("erro",
-					"Inscrições fechadas no momento. Verifique o período de inscrição do evento.");
-			return "redirect:/evento/inscricao/" + id;
-		}
-
-		Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
-		if (opt.isEmpty()) {
-			attr.addFlashAttribute("erro", "Digite um CPF válido.");
-			return "redirect:/evento/inscricao/" + id;
-		}
-
-		Usuario usuario = opt.get();
-
-		String msg = participacaoService.inscrever(usuario.getId(), id);
-		if (msg.equals("Usuário já está inscrito nesse evento!")) {
-			attr.addFlashAttribute("erro", msg);
-			return "redirect:/evento/inscricao/" + id;
-		}
-
-		attr.addFlashAttribute("sucesso", msg);
-		return "redirect:/evento/inscricao/" + id;
-	}
-
-	@GetMapping("/confirmar/{id}")
-	public String confirmarForm(@PathVariable Long id, Model model, RedirectAttributes attr) {
-		Evento evento = service.getById(id);
-		if (!evento.isConfirmacaoAberta()) {
-			attr.addFlashAttribute("erro",
-					"Confirmação fechada no momento. Verifique o período de confirmação do evento.");
-			return "redirect:/evento";
-		}
-		model.addAttribute("evento", evento);
-		return "evento/confirmar";
-	}
-
-	@PostMapping("/confirmar/{id}")
-	public String confirmar(@PathVariable Long id, @RequestParam String cpf, RedirectAttributes attr) {
-		Evento evento = service.getById(id);
-
-		if (!evento.isConfirmacaoAberta()) {
-			attr.addFlashAttribute("erro",
-					"Confirmação fechada no momento. Verifique o período de confirmação do evento.");
-			return "redirect:/evento/confirmar/" + id;
-		}
-
-		Optional<Usuario> opt = usuarioRepository.findByCpf(cpf);
-		if (opt.isEmpty()) {
-			attr.addFlashAttribute("erro", "Digite um CPF válido.");
-			return "redirect:/evento/confirmar/" + id;
-		}
-
-		Usuario usuario = opt.get();
-
-		String msg = participacaoService.participar(usuario.getId(), id);
-		if (msg.equals("Usuário não está inscrito nesse evento!")) {
-			attr.addFlashAttribute("erro", msg);
-			return "redirect:/evento/confirmar/" + id;
-		}
-		if (msg.equals("Usuário já confirmou participação nesse evento!")) {
-			attr.addFlashAttribute("erro", msg);
-			return "redirect:/evento/confirmar/" + id;
-		}
-
-		if (!certificadoRepository.existsByUsuarioIdAndEventoId(usuario.getId(), id)) {
-			try {
-				byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
-				if (pdfBytes.length > 0) {
-					String projectDir = System.getProperty("user.dir");
-					Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads",
-							"certificados");
-					Files.createDirectories(uploadPath);
-					String nomeArquivo = usuario.getId() + "_" + id + ".pdf";
-					Path destino = uploadPath.resolve(nomeArquivo);
-					Files.write(destino, pdfBytes);
-
-					emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
-							"Sua presença no evento " + evento.getTitulo() + " foi confirmada com sucesso. \n "
-									+ "Segue em anexo o seu certificado do evento.",
-							pdfBytes, "certificado.pdf");
-
-					Certificado cert = new Certificado();
-					cert.setUsuario(usuario);
-					cert.setEvento(evento);
-					cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
-					cert.setDataEmissao(LocalDateTime.now());
-					String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-					cert.setHash(certificadoService.generateValidationHash(usuario, evento, dataEmissaoStr));
-					certificadoRepository.save(cert);
-				}
-			} catch (Exception e) {
-				log.error("Erro ao gerar certificado automático", e);
-			}
-		}
-
-		for (Usuario staff : evento.getOrganizadores()) {
-			if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
-				gerarCertificado(staff, evento);
-			}
-		}
-		for (Usuario staff : evento.getPalestrantes()) {
-			if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
-				gerarCertificado(staff, evento);
-			}
-		}
-		for (Usuario staff : evento.getProfessores()) {
-			if (!certificadoRepository.existsByUsuarioIdAndEventoId(staff.getId(), id)) {
-				gerarCertificado(staff, evento);
-			}
-		}
-
-		return "redirect:/evento/confirmado/" + id + "/" + usuario.getId();
-	}
-
-	private void gerarCertificado(Usuario usuario, Evento evento) {
-		log.info("Gerando certificado para usuario {} no evento {}", usuario.getId(), evento.getId());
-		try {
-			byte[] pdfBytes = certificadoService.gerarCertificado(usuario, evento);
-			if (pdfBytes.length > 0) {
-				String projectDir = System.getProperty("user.dir");
-				Path uploadPath = Paths.get(projectDir, "src", "main", "resources", "static", "uploads", "certificados");
-				Files.createDirectories(uploadPath);
-				String nomeArquivo = usuario.getId() + "_" + evento.getId() + ".pdf";
-				Path destino = uploadPath.resolve(nomeArquivo);
-				Files.write(destino, pdfBytes);
-
-				emailService.enviarEmailComAnexo(usuario.getEmail(), "Certificado de Participação",
-						"Olá " + usuario.getNome() + ",\n\n"
-						+ "Seu certificado de participação no evento \"" + evento.getTitulo() + "\" foi gerado com sucesso.\n"
-						+ "Segue em anexo o seu certificado.\n\n"
-						+ "Att,\nMuttley",
-						pdfBytes, "certificado.pdf");
-
-				Certificado cert = new Certificado();
-				cert.setUsuario(usuario);
-				cert.setEvento(evento);
-				cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
-				cert.setDataEmissao(LocalDateTime.now());
-				String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-				cert.setHash(certificadoService.generateValidationHash(usuario, evento, dataEmissaoStr));
-				certificadoRepository.save(cert);
-			}
-		} catch (Exception e) {
-			log.error("Erro ao gerar certificado para usuario " + usuario.getId(), e);
-		}
-	}
 	
-
 	@GetMapping("/confirmado/{id}/{usuarioId}")
 	public String confirmado(@PathVariable Long id, @PathVariable Long usuarioId, Model model) {
 		model.addAttribute("evento", service.getById(id));
