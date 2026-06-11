@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -289,6 +290,8 @@ public class EventoController {
 					cert.setEvento(evento);
 					cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
 					cert.setDataEmissao(LocalDateTime.now());
+					String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+					cert.setHash(certificadoService.generateValidationHash(usuario, evento, dataEmissaoStr));
 					certificadoRepository.save(cert);
 				}
 			} catch (Exception e) {
@@ -339,6 +342,8 @@ public class EventoController {
 				cert.setEvento(evento);
 				cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
 				cert.setDataEmissao(LocalDateTime.now());
+				String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				cert.setHash(certificadoService.generateValidationHash(usuario, evento, dataEmissaoStr));
 				certificadoRepository.save(cert);
 			}
 		} catch (Exception e) {
@@ -386,6 +391,8 @@ public class EventoController {
 				cert.setEvento(evento);
 				cert.setArquivoPath("/uploads/certificados/" + nomeArquivo);
 				cert.setDataEmissao(LocalDateTime.now());
+				String dataEmissaoStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				cert.setHash(certificadoService.generateValidationHash(optUsuario.get(), evento, dataEmissaoStr));
 				certificadoRepository.save(cert);
 			}
 

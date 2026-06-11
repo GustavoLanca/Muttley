@@ -2,6 +2,9 @@ package trab.lesw.certificado;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -106,7 +109,7 @@ public class CertificadoService {
         }
     }
 
-    private String generateValidationHash(Usuario usuario, Evento evento, String dataEmissao) {
+    public String generateValidationHash(Usuario usuario, Evento evento, String dataEmissao) {
     	String input = usuario.getId() + "-" + evento.getId() + "-" + dataEmissao + "-" + SECRET;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
