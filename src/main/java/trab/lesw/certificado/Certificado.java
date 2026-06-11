@@ -45,4 +45,8 @@ public class Certificado implements Serializable {
     private String arquivoPath;
 
     private LocalDateTime dataEmissao;
+
+    @Column(unique = true, nullable = false)
+    private String hash;
+
 }
